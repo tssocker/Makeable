@@ -11,7 +11,10 @@
       "Bash(npm install:*)",
       "Bash(lt:*)",
       "Bash(cloudflared tunnel:*)",
-      "Bash(git init:*)"
+      "Bash(git init:*)",
+      "Bash(gh auth:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []
