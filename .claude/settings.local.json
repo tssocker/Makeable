@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install)",
+      "Bash(npm run dev:*)",
+      "Bash(test:*)",
+      "Bash(open http://localhost:3000)",
+      "Bash(curl:*)",
+      "Bash(brew install:*)",
+      "Bash(ngrok:*)",
+      "Bash(npm install:*)",
+      "Bash(lt:*)",
+      "Bash(cloudflared tunnel:*)",
+      "Bash(git init:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

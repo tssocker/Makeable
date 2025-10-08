@@ -1,0 +1,2111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#FF6B9D">
+    <meta name="description" content="Makeable - AI App Builder. If you can imagine it, we can make it.">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Makeable">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='30' height='30' x='10' y='35' fill='%23FF6B9D' rx='5'/%3E%3Ccircle cx='60' cy='50' r='15' fill='%23FFA500'/%3E%3Cpath d='M75 50h20a15 15 0 0 0-20 0z' fill='%238B7FFF'/%3E%3C/svg%3E">
+    <title>Makeable - AI App Builder</title>
+    <style>
+        :root {
+            --makeable-pink: #FF6B9D;
+            --makeable-orange: #FFA500;
+            --makeable-purple: #8B7FFF;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Auth Screen Styles */
+        .auth-screen {
+            height: 100vh;
+            background: linear-gradient(135deg, var(--makeable-purple) 0%, var(--makeable-pink) 50%, var(--makeable-orange) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            animation: gradientShift 15s ease infinite;
+            background-size: 200% 200%;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .auth-container {
+            max-width: 450px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 3rem 2.5rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: fadeInScale 0.6s ease;
+        }
+
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .auth-logo {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 2rem;
+        }
+
+        .auth-shape {
+            animation: float 3s ease-in-out infinite;
+        }
+        .auth-shape:nth-child(2) { animation-delay: 0.5s; }
+        .auth-shape:nth-child(3) { animation-delay: 1s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .auth-shape-square {
+            width: 50px;
+            height: 50px;
+            background: var(--makeable-pink);
+            border-radius: 10px;
+        }
+        .auth-shape-circle {
+            width: 50px;
+            height: 50px;
+            background: var(--makeable-orange);
+            border-radius: 50%;
+        }
+        .auth-shape-arch {
+            width: 50px;
+            height: 37px;
+            background: var(--makeable-purple);
+            border-radius: 37px 37px 0 0;
+        }
+
+        .auth-title {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .auth-subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
+
+        .auth-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            background: #f5f5f5;
+            padding: 0.375rem;
+            border-radius: 12px;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 0.75rem;
+            border: none;
+            background: transparent;
+            color: #666;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .auth-tab.active {
+            background: white;
+            color: var(--makeable-pink);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+            font-size: 0.9rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--makeable-pink);
+            box-shadow: 0 0 0 3px rgba(255, 107, 157, 0.1);
+        }
+
+        .form-input.error {
+            border-color: #dc3545;
+        }
+
+        .form-error {
+            color: #dc3545;
+            font-size: 0.85rem;
+            margin-top: 0.375rem;
+            display: none;
+        }
+
+        .form-error.show {
+            display: block;
+        }
+
+        .auth-button {
+            width: 100%;
+            padding: 1rem;
+            margin-top: 0.5rem;
+            background: linear-gradient(135deg, var(--makeable-pink) 0%, var(--makeable-orange) 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 157, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 157, 0.6);
+        }
+
+        .auth-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .auth-button.loading::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            to { left: 100%; }
+        }
+
+        .auth-status {
+            margin-top: 1rem;
+            padding: 0.875rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            text-align: center;
+            display: none;
+        }
+
+        .auth-status.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .auth-status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .auth-status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        /* Landing Page Styles */
+        .landing-page {
+            display: none;
+            height: 100vh;
+            background: linear-gradient(135deg, var(--makeable-purple) 0%, var(--makeable-pink) 50%, var(--makeable-orange) 100%);
+            animation: gradientShift 15s ease infinite;
+            background-size: 200% 200%;
+        }
+
+        .landing-page.active {
+            display: flex;
+        }
+
+        .landing-sidebar {
+            display: none;
+        }
+
+        .landing-sidebar-header {
+            padding: 2rem;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .landing-sidebar-title {
+            color: white;
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .landing-sidebar-subtitle {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        .landing-projects-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+
+        .landing-project-item {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .landing-project-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateX(5px);
+        }
+
+        .landing-project-name {
+            color: white;
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .landing-project-date {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.8rem;
+        }
+
+        .landing-sidebar-footer {
+            padding: 1.5rem;
+            border-top: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .landing-sidebar-footer .user-profile {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .landing-sidebar-footer .user-profile:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .landing-main {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .projects-toggle-btn {
+            position: absolute;
+            top: 2rem;
+            left: 2rem;
+            padding: 0.875rem 1.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .projects-toggle-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .landing-sidebar.show {
+            display: flex;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 320px;
+            z-index: 1000;
+            box-shadow: 2px 0 20px rgba(0, 0, 0, 0.5);
+            animation: slideInLeft 0.3s ease;
+        }
+
+        @keyframes slideInLeft {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(0); }
+        }
+
+        .projects-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        .projects-overlay.show {
+            display: block;
+        }
+
+        .landing-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .landing-header h1 {
+            font-size: 4rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 20px rgba(0,0,0,0.2);
+        }
+
+        .logo-shapes {
+            display: inline-flex;
+            gap: 8px;
+            align-items: center;
+            margin-right: 20px;
+            vertical-align: middle;
+        }
+
+        .shape { animation: float 3s ease-in-out infinite; }
+        .shape:nth-child(2) { animation-delay: 0.5s; }
+        .shape:nth-child(3) { animation-delay: 1s; }
+
+        .shape-square {
+            width: 40px;
+            height: 40px;
+            background: var(--makeable-pink);
+            border-radius: 8px;
+        }
+
+        .shape-circle {
+            width: 40px;
+            height: 40px;
+            background: var(--makeable-orange);
+            border-radius: 50%;
+        }
+
+        .shape-arch {
+            width: 40px;
+            height: 30px;
+            background: var(--makeable-purple);
+            border-radius: 30px 30px 0 0;
+        }
+
+        .landing-header p {
+            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.95);
+            font-weight: 300;
+        }
+
+        .landing-input-container {
+            max-width: 700px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeInUp 0.8s ease;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .landing-textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 1.25rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-family: inherit;
+            resize: vertical;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .landing-textarea:focus {
+            outline: none;
+            border-color: var(--makeable-pink);
+            box-shadow: 0 0 0 3px rgba(255, 107, 157, 0.1);
+        }
+
+        .landing-button {
+            width: 100%;
+            padding: 1.25rem;
+            margin-top: 1rem;
+            background: linear-gradient(135deg, var(--makeable-pink) 0%, var(--makeable-orange) 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 157, 0.4);
+        }
+
+        .landing-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 157, 0.6);
+        }
+
+        .landing-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* App Container Styles */
+        .app-container {
+            display: none;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        .app-container.active { display: flex; }
+
+        header {
+            background: linear-gradient(135deg, var(--makeable-purple) 0%, var(--makeable-pink) 100%);
+            color: white;
+            padding: 1.25rem 2rem;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-logo { display: flex; gap: 6px; }
+
+        .mini-shape-square {
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 4px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .mini-shape-circle {
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            animation: float 3s ease-in-out infinite;
+            animation-delay: 0.5s;
+        }
+
+        .mini-shape-arch {
+            width: 20px;
+            height: 15px;
+            background: white;
+            border-radius: 15px 15px 0 0;
+            animation: float 3s ease-in-out infinite;
+            animation-delay: 1s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .back-home-btn {
+            padding: 0.75rem 1.5rem;
+            background: white;
+            color: var(--makeable-pink);
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .back-home-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .container { display: flex; flex: 1; overflow: hidden; }
+
+        .projects-sidebar {
+            width: 320px;
+            min-width: 200px;
+            max-width: 500px;
+            background: white;
+            border-right: 1px solid #e0e0e0;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-section {
+            width: 420px;
+            min-width: 200px;
+            max-width: 600px;
+            background: white;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            box-shadow: 2px 0 15px rgba(0,0,0,0.08);
+        }
+
+        .resize-handle {
+            width: 4px;
+            background: transparent;
+            cursor: col-resize;
+            position: relative;
+            flex-shrink: 0;
+            transition: background 0.2s;
+        }
+
+        .resize-handle:hover {
+            background: linear-gradient(135deg, var(--makeable-pink) 0%, var(--makeable-orange) 100%);
+        }
+
+        .resize-handle:active {
+            background: var(--makeable-purple);
+        }
+
+        .resize-handle::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: -2px;
+            right: -2px;
+        }
+
+        @keyframes slideInLeft {
+            from { transform: translateX(-100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 2px solid #e0e0e0;
+            background: linear-gradient(135deg, rgba(139, 127, 255, 0.1) 0%, rgba(255, 107, 157, 0.1) 100%);
+        }
+
+        .sidebar-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .new-project-btn {
+            width: 100%;
+            padding: 0.875rem;
+            background: linear-gradient(135deg, var(--makeable-pink) 0%, var(--makeable-orange) 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(255, 107, 157, 0.3);
+        }
+
+        .new-project-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 107, 157, 0.5);
+        }
+
+        .sidebar-footer {
+            border-top: 2px solid #e0e0e0;
+            padding: 1rem 1.5rem;
+            background: #fafafa;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .user-profile:hover {
+            border-color: var(--makeable-pink);
+            transform: translateY(-2px);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--makeable-pink) 0%, var(--makeable-orange) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .user-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #333;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .user-email {
+            font-size: 0.75rem;
+            color: #666;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Profile Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 400px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #666;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background: #f5f5f5;
+            color: var(--makeable-pink);
+        }
+
+        .profile-avatar-section {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .profile-avatar-large {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--makeable-pink) 0%, var(--makeable-orange) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 2.5rem;
+            margin: 0 auto 1rem;
+        }
+
+        .profile-avatar-large img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .modal-button {
+            width: 100%;
+            padding: 0.875rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 0.75rem;
+        }
+
+        .modal-button.primary {
+            background: linear-gradient(135deg, var(--makeable-pink) 0%, var(--makeable-orange) 100%);
+            color: white;
+            box-shadow: 0 2px 8px rgba(255, 107, 157, 0.3);
+        }
+
+        .modal-button.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 107, 157, 0.5);
+        }
+
+        .modal-button.secondary {
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        .modal-button.secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .modal-button.danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .modal-button.danger:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+        .project-item {
+            padding: 1.25rem;
+            border-bottom: 1px solid #e0e0e0;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .project-item:hover {
+            background: #f5f5f5;
+            padding-left: 1.5rem;
+        }
+
+        .project-item.active {
+            background: linear-gradient(135deg, var(--makeable-purple) 0%, var(--makeable-pink) 100%);
+            color: white;
+            border-left: 4px solid white;
+        }
+
+        .project-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .project-item h3 {
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            flex: 1;
+            word-break: break-word;
+        }
+
+        .project-item p {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        .project-actions {
+            display: flex;
+            gap: 0.5rem;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .project-item:hover .project-actions,
+        .project-item.active .project-actions {
+            opacity: 1;
+        }
+
+        .rename-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+
+        .project-item.active .rename-btn {
+            background: rgba(255,255,255,0.3);
+            color: white;
+        }
+
+        .project-item:not(.active) .rename-btn {
+            color: var(--makeable-pink);
+        }
+
+        .rename-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .rename-input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 2px solid var(--makeable-pink);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* input-section already defined above with toggle functionality */
+
+        label {
+            font-weight: 600;
+            color: #333;
+            font-size: 1rem;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 160px;
+            padding: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            resize: vertical;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--makeable-pink);
+            box-shadow: 0 0 0 3px rgba(255, 107, 157, 0.1);
+        }
+
+        button:not(.auth-button):not(.auth-tab):not(.modal-button):not(.modal-close) {
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, var(--makeable-pink) 0%, var(--makeable-orange) 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(255, 107, 157, 0.3);
+        }
+
+        button:not(.auth-button):not(.auth-tab):not(.modal-button):not(.modal-close):hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(255, 107, 157, 0.4);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .preview-section {
+            flex: 1;
+            background: white;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .preview-header {
+            padding: 1.25rem 2rem;
+            background: linear-gradient(135deg, rgba(139, 127, 255, 0.1) 0%, rgba(255, 107, 157, 0.1) 100%);
+            border-bottom: 2px solid #e0e0e0;
+            font-weight: 700;
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        #preview-frame {
+            flex: 1;
+            border: none;
+            background: white;
+        }
+
+        .status {
+            padding: 0.9rem 1.25rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .status.loading {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            color: #856404;
+            position: relative;
+        }
+
+        .status.loading::after {
+            content: '';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+
+        .code-viewer {
+            margin-top: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            background: white;
+            animation: slideDown 0.3s ease;
+        }
+
+        .code-viewer-header {
+            background: linear-gradient(135deg, var(--makeable-purple) 0%, var(--makeable-pink) 100%);
+            padding: 0.875rem 1.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s;
+        }
+
+        .code-viewer-header:hover {
+            background: linear-gradient(135deg, var(--makeable-purple) 20%, var(--makeable-pink) 120%);
+        }
+
+        .code-viewer-title {
+            color: white;
+            font-weight: 600;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .code-viewer-toggle {
+            color: white;
+            font-size: 1.2rem;
+            transition: transform 0.3s ease;
+        }
+
+        .code-viewer-toggle.open {
+            transform: rotate(180deg);
+        }
+
+        .code-viewer-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .code-viewer-content.open {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .code-file {
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .code-file:last-child {
+            border-bottom: none;
+        }
+
+        .code-file-header {
+            background: #f8f9fa;
+            padding: 0.625rem 1rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #495057;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .code-file-name {
+            font-family: 'Courier New', monospace;
+        }
+
+        .copy-btn {
+            background: var(--makeable-pink);
+            color: white;
+            border: none;
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .copy-btn:hover {
+            background: var(--makeable-orange);
+            transform: translateY(-1px);
+        }
+
+        .copy-btn.copied {
+            background: #28a745;
+        }
+
+        .code-content {
+            padding: 1rem;
+            background: #f8f9fa;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 300px;
+            overflow-y: auto;
+            color: #212529;
+        }
+
+        .status.success {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            color: #155724;
+        }
+
+        .status.error {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            color: #721c24;
+        }
+
+        .status.hidden {
+            display: none;
+        }
+
+        .empty-state {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #999;
+            font-size: 1rem;
+            padding: 2rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- Auth Screen -->
+    <div class="auth-screen" id="auth-screen">
+        <div class="auth-container">
+            <div class="auth-logo">
+                <div class="auth-shape auth-shape-square"></div>
+                <div class="auth-shape auth-shape-circle"></div>
+                <div class="auth-shape auth-shape-arch"></div>
+            </div>
+
+            <h1 class="auth-title">Makeable</h1>
+            <p class="auth-subtitle">If you can imagine it, we can make it.</p>
+
+            <div class="auth-tabs">
+                <button class="auth-tab active" data-tab="login">Login</button>
+                <button class="auth-tab" data-tab="register">Register</button>
+            </div>
+
+            <!-- Login Form -->
+            <form class="auth-form active" id="login-form">
+                <div class="form-group">
+                    <label class="form-label" for="login-email">Email</label>
+                    <input type="email" class="form-input" id="login-email" required>
+                    <div class="form-error" id="login-email-error"></div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="login-password">Password</label>
+                    <input type="password" class="form-input" id="login-password" required>
+                    <div class="form-error" id="login-password-error"></div>
+                </div>
+                <button type="submit" class="auth-button" id="login-btn">Login</button>
+                <div class="auth-status" id="login-status"></div>
+            </form>
+
+            <!-- Register Form -->
+            <form class="auth-form" id="register-form">
+                <div class="form-group">
+                    <label class="form-label" for="register-name">Name</label>
+                    <input type="text" class="form-input" id="register-name" required>
+                    <div class="form-error" id="register-name-error"></div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="register-email">Email</label>
+                    <input type="email" class="form-input" id="register-email" required>
+                    <div class="form-error" id="register-email-error"></div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="register-password">Password</label>
+                    <input type="password" class="form-input" id="register-password" required>
+                    <div class="form-error" id="register-password-error"></div>
+                </div>
+                <button type="submit" class="auth-button" id="register-btn">Register</button>
+                <div class="auth-status" id="register-status"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Projects Overlay -->
+    <div class="projects-overlay" id="projects-overlay" onclick="closeProjectsSidebar()"></div>
+
+    <!-- Landing Page -->
+    <div class="landing-page" id="landing-page">
+        <div class="landing-sidebar" id="landing-sidebar">
+            <div class="landing-sidebar-header">
+                <div class="landing-sidebar-title">Your Projects</div>
+                <div class="landing-sidebar-subtitle">Click on a project to open it</div>
+            </div>
+            <div class="landing-projects-list" id="landing-projects-list">
+                <!-- Projects will be loaded here -->
+            </div>
+            <div class="landing-sidebar-footer">
+                <div class="user-profile" id="landing-user-profile">
+                    <div class="user-avatar" id="landing-user-avatar"></div>
+                    <div class="user-info">
+                        <div class="user-name" id="landing-user-name">Loading...</div>
+                        <div class="user-email" id="landing-user-email"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="landing-main">
+            <button class="projects-toggle-btn" id="projects-toggle-btn" onclick="goToProjects()">
+                <span id="projects-toggle-icon">📂</span>
+                <span>Projects</span>
+            </button>
+            <div class="landing-header">
+                <h1>
+                    <div class="logo-shapes">
+                        <div class="shape shape-square"></div>
+                        <div class="shape shape-circle"></div>
+                        <div class="shape shape-arch"></div>
+                    </div>
+                    <strong>Makeable</strong>
+                </h1>
+                <p>If you can imagine it, we can make it.</p>
+            </div>
+            <div class="landing-input-container">
+                <textarea id="landing-prompt" class="landing-textarea" placeholder="Just make it happen"></textarea>
+                <button id="landing-button" class="landing-button">Create App</button>
+                <div id="landing-status" class="status hidden"></div>
+                <div id="landing-code-viewer" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- App Container -->
+    <div class="app-container" id="app-container">
+        <header>
+            <h1>
+                <div class="header-logo">
+                    <div class="mini-shape-square"></div>
+                    <div class="mini-shape-circle"></div>
+                    <div class="mini-shape-arch"></div>
+                </div>
+                Makeable
+            </h1>
+        </header>
+        <div class="container">
+            <div class="projects-sidebar" id="app-projects-sidebar">
+                <div class="sidebar-content" id="projects-sidebar">
+                    <div class="sidebar-header">
+                        <div class="sidebar-title">Your Projects</div>
+                        <button class="new-project-btn" onclick="newProject()">+ New Project</button>
+                    </div>
+                </div>
+                <div class="sidebar-footer">
+                    <div class="user-profile" id="user-profile-btn">
+                        <div class="user-avatar" id="user-avatar"></div>
+                        <div class="user-info">
+                            <div class="user-name" id="user-name">Loading...</div>
+                            <div class="user-email" id="user-email"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="resize-handle" id="resize-handle-1"></div>
+            <div class="input-section" id="app-input-section">
+                <label for="prompt" id="prompt-label">Describe your app:</label>
+                <textarea id="prompt" placeholder="Example: Create a simple todo list app"></textarea>
+                <button id="generate-btn">Generate App</button>
+                <div id="status" class="status hidden"></div>
+                <div id="code-viewer" style="display: none;"></div>
+            </div>
+            <div class="resize-handle" id="resize-handle-2"></div>
+            <div class="preview-section">
+                <div class="preview-header">Preview</div>
+                <iframe id="preview-frame"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div class="modal-overlay" id="profile-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Profile</h2>
+                <button class="modal-close" onclick="closeProfileModal()">&times;</button>
+            </div>
+            <div class="profile-avatar-section">
+                <div class="profile-avatar-large" id="profile-avatar-large"></div>
+            </div>
+            <form id="profile-form">
+                <div class="form-group">
+                    <label class="form-label" for="profile-name">Name</label>
+                    <input type="text" class="form-input" id="profile-name" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="profile-picture">Profile Picture URL</label>
+                    <input type="url" class="form-input" id="profile-picture" placeholder="https://...">
+                </div>
+                <button type="submit" class="modal-button primary">Save Changes</button>
+                <div class="auth-status" id="profile-status"></div>
+            </form>
+            <button class="modal-button danger" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = window.location.origin;
+        let currentProjectId = null;
+        let renamingProjectId = null;
+        let currentUser = null;
+
+        // DOM Elements
+        const authScreen = document.getElementById('auth-screen');
+        const landingPage = document.getElementById('landing-page');
+        const appContainer = document.getElementById('app-container');
+        const profileModal = document.getElementById('profile-modal');
+
+        // Auth State Management
+        function getToken() {
+            return localStorage.getItem('auth_token');
+        }
+
+        function setToken(token) {
+            localStorage.setItem('auth_token', token);
+        }
+
+        function clearToken() {
+            localStorage.removeItem('auth_token');
+        }
+
+        async function fetchWithAuth(url, options = {}) {
+            const token = getToken();
+            if (token) {
+                options.headers = {
+                    ...options.headers,
+                    'Authorization': `Bearer ${token}`
+                };
+            }
+            return fetch(url, options);
+        }
+
+        // Check Auth Status
+        async function checkAuth() {
+            const token = getToken();
+            if (!token) {
+                showAuthScreen();
+                return false;
+            }
+
+            try {
+                const response = await fetchWithAuth(`${API_URL}/api/auth/me`);
+                if (response.ok) {
+                    const data = await response.json();
+                    currentUser = data; // API returns user object directly
+                    updateUserProfile();
+                    showLandingPage();
+                    return true;
+                } else {
+                    clearToken();
+                    showAuthScreen();
+                    return false;
+                }
+            } catch (error) {
+                console.error('Auth check failed:', error);
+                clearToken();
+                showAuthScreen();
+                return false;
+            }
+        }
+
+        function showAuthScreen() {
+            authScreen.style.display = 'flex';
+            landingPage.classList.remove('active');
+            appContainer.classList.remove('active');
+        }
+
+        function showLandingPage() {
+            authScreen.style.display = 'none';
+            landingPage.classList.add('active');
+            appContainer.classList.remove('active');
+        }
+
+        function showAppContainer() {
+            authScreen.style.display = 'none';
+            landingPage.classList.remove('active');
+            appContainer.classList.add('active');
+        }
+
+        // Auth Tab Switching
+        document.querySelectorAll('.auth-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabName = tab.dataset.tab;
+                document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(`${tabName}-form`).classList.add('active');
+            });
+        });
+
+        // Login Form
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value;
+            const btn = document.getElementById('login-btn');
+            const status = document.getElementById('login-status');
+
+            btn.disabled = true;
+            btn.classList.add('loading');
+            status.className = 'auth-status';
+
+            try {
+                const response = await fetch(`${API_URL}/api/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    setToken(data.token);
+                    currentUser = data.user;
+                    status.textContent = 'Login successful!';
+                    status.className = 'auth-status success show';
+                    setTimeout(() => {
+                        updateUserProfile();
+                        showLandingPage();
+                    }, 1000);
+                } else {
+                    status.textContent = data.error || 'Login failed';
+                    status.className = 'auth-status error show';
+                }
+            } catch (error) {
+                status.textContent = 'Network error. Please try again.';
+                status.className = 'auth-status error show';
+            } finally {
+                btn.disabled = false;
+                btn.classList.remove('loading');
+            }
+        });
+
+        // Register Form
+        document.getElementById('register-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('register-name').value.trim();
+            const email = document.getElementById('register-email').value.trim();
+            const password = document.getElementById('register-password').value;
+            const btn = document.getElementById('register-btn');
+            const status = document.getElementById('register-status');
+
+            if (password.length < 6) {
+                status.textContent = 'Password must be at least 6 characters';
+                status.className = 'auth-status error show';
+                return;
+            }
+
+            btn.disabled = true;
+            btn.classList.add('loading');
+            status.className = 'auth-status';
+
+            try {
+                const response = await fetch(`${API_URL}/api/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    setToken(data.token);
+                    currentUser = data.user;
+                    status.textContent = 'Registration successful!';
+                    status.className = 'auth-status success show';
+                    setTimeout(() => {
+                        updateUserProfile();
+                        showLandingPage();
+                    }, 1000);
+                } else {
+                    status.textContent = data.error || 'Registration failed';
+                    status.className = 'auth-status error show';
+                }
+            } catch (error) {
+                status.textContent = 'Network error. Please try again.';
+                status.className = 'auth-status error show';
+            } finally {
+                btn.disabled = false;
+                btn.classList.remove('loading');
+            }
+        });
+
+        // Update User Profile Display
+        function updateUserProfile() {
+            if (!currentUser) return;
+
+            // Update app container profile
+            const userName = document.getElementById('user-name');
+            const userEmail = document.getElementById('user-email');
+            const userAvatar = document.getElementById('user-avatar');
+            const profileAvatarLarge = document.getElementById('profile-avatar-large');
+
+            userName.textContent = currentUser.name;
+            userEmail.textContent = currentUser.email;
+
+            const avatarContent = currentUser.profilePicture
+                ? `<img src="${currentUser.profilePicture}" alt="${currentUser.name}">`
+                : currentUser.name.charAt(0).toUpperCase();
+
+            userAvatar.innerHTML = avatarContent;
+            profileAvatarLarge.innerHTML = avatarContent;
+
+            // Update landing page profile
+            const landingUserName = document.getElementById('landing-user-name');
+            const landingUserEmail = document.getElementById('landing-user-email');
+            const landingUserAvatar = document.getElementById('landing-user-avatar');
+
+            landingUserName.textContent = currentUser.name;
+            landingUserEmail.textContent = currentUser.email;
+            landingUserAvatar.innerHTML = avatarContent;
+
+            document.getElementById('profile-name').value = currentUser.name;
+            document.getElementById('profile-picture').value = currentUser.profilePicture || '';
+        }
+
+        // Load projects for landing page sidebar
+        async function loadLandingProjects() {
+            try {
+                const r = await fetchWithAuth(`${API_URL}/api/projects`);
+                const data = await r.json();
+                const list = document.getElementById('landing-projects-list');
+
+                if (data.projects.length === 0) {
+                    list.innerHTML = '<div class="empty-state" style="color: rgba(255,255,255,0.5);">No projects yet<br>Create your first app!</div>';
+                    return;
+                }
+
+                list.innerHTML = '';
+                data.projects.reverse().forEach(project => {
+                    const div = document.createElement('div');
+                    div.className = 'landing-project-item';
+                    div.innerHTML = `
+                        <div class="landing-project-name">${project.name}</div>
+                        <div class="landing-project-date">${new Date(project.createdAt).toLocaleDateString()}</div>
+                    `;
+                    div.onclick = () => loadProjectFromLanding(project.id);
+                    list.appendChild(div);
+                });
+            } catch (e) {
+                console.error('Error loading landing projects:', e);
+            }
+        }
+
+        async function loadProjectFromLanding(projectId) {
+            try {
+                closeProjectsSidebar(); // Close sidebar first
+
+                const r = await fetchWithAuth(`${API_URL}/api/projects/${projectId}`);
+                const project = await r.json();
+                currentProjectId = project.id;
+                promptInput.value = '';
+                promptLabel.textContent = 'Continue working on this project:';
+                generateBtn.textContent = 'Update Project';
+
+                // Show code viewer for this project
+                createCodeViewer(project.files, 'code-viewer');
+
+                const indexFile = project.files.find(f => f.path === 'index.html');
+                if (indexFile) {
+                    const blob = new Blob([indexFile.content], { type: 'text/html' });
+                    previewFrame.src = URL.createObjectURL(blob);
+                }
+
+                showAppContainer();
+                await loadProjects();
+            } catch (e) {
+                console.error('Error loading project:', e);
+            }
+        }
+
+        // Profile Modal
+        document.getElementById('user-profile-btn').addEventListener('click', () => {
+            profileModal.classList.add('active');
+        });
+
+        document.getElementById('landing-user-profile').addEventListener('click', () => {
+            profileModal.classList.add('active');
+        });
+
+        function closeProfileModal() {
+            profileModal.classList.remove('active');
+        }
+
+        profileModal.addEventListener('click', (e) => {
+            if (e.target === profileModal) {
+                closeProfileModal();
+            }
+        });
+
+        // Profile Form
+        document.getElementById('profile-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('profile-name').value.trim();
+            const profilePicture = document.getElementById('profile-picture').value.trim();
+            const status = document.getElementById('profile-status');
+
+            status.className = 'auth-status';
+
+            try {
+                const response = await fetchWithAuth(`${API_URL}/api/auth/profile`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, profilePicture })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    currentUser = data.user;
+                    updateUserProfile();
+                    status.textContent = 'Profile updated successfully!';
+                    status.className = 'auth-status success show';
+                    setTimeout(() => {
+                        status.className = 'auth-status';
+                    }, 3000);
+                } else {
+                    status.textContent = data.error || 'Failed to update profile';
+                    status.className = 'auth-status error show';
+                }
+            } catch (error) {
+                status.textContent = 'Network error. Please try again.';
+                status.className = 'auth-status error show';
+            }
+        });
+
+        // Logout
+        async function logout() {
+            try {
+                await fetchWithAuth(`${API_URL}/api/auth/logout`, { method: 'POST' });
+            } catch (error) {
+                console.error('Logout error:', error);
+            } finally {
+                clearToken();
+                currentUser = null;
+                currentProjectId = null;
+                closeProfileModal();
+                showAuthScreen();
+                document.getElementById('login-form').reset();
+                document.getElementById('register-form').reset();
+            }
+        }
+
+        // App Functions
+        const landingPrompt = document.getElementById('landing-prompt');
+        const landingButton = document.getElementById('landing-button');
+        const landingStatus = document.getElementById('landing-status');
+        const promptInput = document.getElementById('prompt');
+        const generateBtn = document.getElementById('generate-btn');
+        const statusDiv = document.getElementById('status');
+        const previewFrame = document.getElementById('preview-frame');
+        const promptLabel = document.getElementById('prompt-label');
+
+        function showLandingStatus(m, t) {
+            landingStatus.textContent = m;
+            landingStatus.className = `status ${t}`;
+        }
+
+        function showStatus(m, t) {
+            statusDiv.textContent = m;
+            statusDiv.className = `status ${t}`;
+        }
+
+        function createCodeViewer(files, elementId) {
+            const viewer = document.getElementById(elementId);
+            if (!files || files.length === 0) {
+                viewer.style.display = 'none';
+                return;
+            }
+
+            const filesHtml = files.map(file => `
+                <div class="code-file">
+                    <div class="code-file-header">
+                        <span class="code-file-name">${file.path}</span>
+                        <button class="copy-btn" onclick="copyCode('${file.path}', this)">Copy</button>
+                    </div>
+                    <div class="code-content" id="code-${file.path.replace(/\./g, '-')}">${escapeHtml(file.content)}</div>
+                </div>
+            `).join('');
+
+            viewer.innerHTML = `
+                <div class="code-viewer">
+                    <div class="code-viewer-header" onclick="toggleCodeViewer('${elementId}')">
+                        <div class="code-viewer-title">
+                            <span>📄</span>
+                            <span>View Generated Code</span>
+                        </div>
+                        <span class="code-viewer-toggle" id="${elementId}-toggle">▼</span>
+                    </div>
+                    <div class="code-viewer-content" id="${elementId}-content">
+                        ${filesHtml}
+                    </div>
+                </div>
+            `;
+            viewer.style.display = 'block';
+        }
+
+        function toggleCodeViewer(elementId) {
+            const content = document.getElementById(`${elementId}-content`);
+            const toggle = document.getElementById(`${elementId}-toggle`);
+
+            if (content.classList.contains('open')) {
+                content.classList.remove('open');
+                toggle.classList.remove('open');
+            } else {
+                content.classList.add('open');
+                toggle.classList.add('open');
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        async function copyCode(filePath, button) {
+            const codeElement = document.getElementById(`code-${filePath.replace(/\./g, '-')}`);
+            const text = codeElement.textContent;
+
+            try {
+                await navigator.clipboard.writeText(text);
+                const originalText = button.textContent;
+                button.textContent = '✓ Copied!';
+                button.classList.add('copied');
+
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.classList.remove('copied');
+                }, 2000);
+            } catch (err) {
+                console.error('Failed to copy:', err);
+            }
+        }
+
+        function goHome() {
+            showLandingPage();
+            currentProjectId = null;
+            landingPrompt.value = '';
+            promptInput.value = '';
+            previewFrame.src = '';
+        }
+
+        function newProject() {
+            currentProjectId = null;
+            promptInput.value = '';
+            promptLabel.textContent = 'Describe your app:';
+            generateBtn.textContent = 'Generate App';
+            previewFrame.src = '';
+            document.querySelectorAll('.project-item').forEach(el => el.classList.remove('active'));
+        }
+
+        function startRename(projectId, currentName, event) {
+            event.stopPropagation();
+            renamingProjectId = projectId;
+            const projectEl = event.target.closest('.project-item');
+            const h3 = projectEl.querySelector('h3');
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'rename-input';
+            input.value = currentName;
+            input.onkeydown = async (e) => {
+                if (e.key === 'Enter') await saveRename(projectId, input.value);
+                else if (e.key === 'Escape') await loadProjects();
+            };
+            input.onblur = async () => await saveRename(projectId, input.value);
+            h3.replaceWith(input);
+            input.focus();
+            input.select();
+        }
+
+        async function saveRename(projectId, newName) {
+            if (!newName.trim()) {
+                await loadProjects();
+                return;
+            }
+            try {
+                const r = await fetchWithAuth(`${API_URL}/api/projects/${projectId}/rename`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: newName.trim() })
+                });
+                if (r.ok) await loadProjects();
+            } catch (e) {
+                console.error('Error renaming:', e);
+            }
+            renamingProjectId = null;
+        }
+
+        async function loadProjects() {
+            try {
+                const r = await fetchWithAuth(`${API_URL}/api/projects`);
+                const data = await r.json();
+                const sidebar = document.getElementById('projects-sidebar');
+                const header = sidebar.querySelector('.sidebar-header');
+                sidebar.innerHTML = '';
+                sidebar.appendChild(header);
+                if (data.projects.length === 0) {
+                    sidebar.innerHTML += '<div class="empty-state">No projects yet<br>Click "New Project" to start!</div>';
+                    return;
+                }
+                data.projects.reverse().forEach(project => {
+                    const div = document.createElement('div');
+                    div.className = 'project-item';
+                    if (project.id === currentProjectId) div.classList.add('active');
+                    div.innerHTML = `<div class="project-item-header"><h3>${project.name}</h3><div class="project-actions"><button class="rename-btn" onclick="startRename('${project.id}', '${project.name.replace(/'/g, "\\'")}', event)">✎</button></div></div><p>${new Date(project.createdAt).toLocaleDateString()}</p>`;
+                    div.onclick = (e) => {
+                        if (!e.target.closest('.rename-btn')) loadProject(project.id);
+                    };
+                    sidebar.appendChild(div);
+                });
+            } catch (e) {
+                console.error('Error loading projects:', e);
+            }
+        }
+
+        async function loadProject(projectId) {
+            try {
+                const r = await fetchWithAuth(`${API_URL}/api/projects/${projectId}`);
+                const project = await r.json();
+                currentProjectId = project.id;
+                promptInput.value = '';
+                promptLabel.textContent = 'Continue working on this project:';
+                generateBtn.textContent = 'Update Project';
+
+                // Show code viewer for this project
+                createCodeViewer(project.files, 'code-viewer');
+
+                const indexFile = project.files.find(f => f.path === 'index.html');
+                if (indexFile) {
+                    const blob = new Blob([indexFile.content], { type: 'text/html' });
+                    previewFrame.src = URL.createObjectURL(blob);
+                }
+                await loadProjects();
+            } catch (e) {
+                console.error('Error loading project:', e);
+                showStatus('Failed to load project', 'error');
+            }
+        }
+
+        landingButton.addEventListener('click', async () => {
+            const prompt = landingPrompt.value.trim();
+            if (!prompt) {
+                showLandingStatus('Please enter a description', 'error');
+                return;
+            }
+            landingButton.disabled = true;
+            showLandingStatus('Creating your app', 'loading');
+            document.getElementById('landing-code-viewer').style.display = 'none';
+            try {
+                const r = await fetchWithAuth(`${API_URL}/api/generate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt })
+                });
+                const data = await r.json();
+                if (!r.ok) throw new Error(data.error || 'Failed to generate app');
+                currentProjectId = data.project.id;
+
+                // Create code viewer
+                createCodeViewer(data.project.files, 'landing-code-viewer');
+
+                const indexFile = data.project.files.find(f => f.path === 'index.html');
+                if (indexFile) {
+                    const blob = new Blob([indexFile.content], { type: 'text/html' });
+                    previewFrame.src = URL.createObjectURL(blob);
+                }
+                showAppContainer();
+                await loadProjects();
+                showStatus('App created successfully!', 'success');
+
+                // Show code viewer in app container too
+                createCodeViewer(data.project.files, 'code-viewer');
+            } catch (e) {
+                showLandingStatus(e.message, 'error');
+            } finally {
+                landingButton.disabled = false;
+            }
+        });
+
+        generateBtn.addEventListener('click', async () => {
+            const prompt = promptInput.value.trim();
+            if (!prompt) {
+                showStatus('Please enter a description', 'error');
+                return;
+            }
+            generateBtn.disabled = true;
+            showStatus('Generating your app', 'loading');
+            document.getElementById('code-viewer').style.display = 'none';
+            try {
+                const url = currentProjectId
+                    ? `${API_URL}/api/projects/${currentProjectId}/iterate`
+                    : `${API_URL}/api/generate`;
+                const r = await fetchWithAuth(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt })
+                });
+                const data = await r.json();
+                if (!r.ok) throw new Error(data.error || 'Failed to generate app');
+                showStatus('App generated successfully!', 'success');
+                currentProjectId = data.project.id;
+                promptInput.value = '';
+
+                // Create code viewer
+                createCodeViewer(data.project.files, 'code-viewer');
+
+                const indexFile = data.project.files.find(f => f.path === 'index.html');
+                if (indexFile) {
+                    const blob = new Blob([indexFile.content], { type: 'text/html' });
+                    previewFrame.src = URL.createObjectURL(blob);
+                }
+                await loadProjects();
+            } catch (e) {
+                showStatus(e.message, 'error');
+            } finally {
+                generateBtn.disabled = false;
+            }
+        });
+
+        // Navigate to Projects from Landing Page
+        function goToProjects() {
+            showAppContainer();
+            loadProjects();
+        }
+
+        function closeProjectsSidebar() {
+            const sidebar = document.getElementById('landing-sidebar');
+            const overlay = document.getElementById('projects-overlay');
+            if (sidebar) {
+                sidebar.classList.remove('show');
+                overlay.classList.remove('show');
+            }
+        }
+
+        // Resize functionality
+        function initResize() {
+            const handle1 = document.getElementById('resize-handle-1');
+            const handle2 = document.getElementById('resize-handle-2');
+            const projectsSidebar = document.getElementById('app-projects-sidebar');
+            const inputSection = document.getElementById('app-input-section');
+
+            let isResizing = false;
+            let currentHandle = null;
+
+            function startResize(e, handle) {
+                isResizing = true;
+                currentHandle = handle;
+                document.body.style.cursor = 'col-resize';
+                document.body.style.userSelect = 'none';
+                e.preventDefault();
+            }
+
+            function resize(e) {
+                if (!isResizing) return;
+
+                const containerRect = document.querySelector('.container').getBoundingClientRect();
+
+                if (currentHandle === handle1) {
+                    const newWidth = e.clientX - containerRect.left;
+                    if (newWidth >= 200 && newWidth <= 500) {
+                        projectsSidebar.style.width = newWidth + 'px';
+                    }
+                } else if (currentHandle === handle2) {
+                    const projectsWidth = projectsSidebar.offsetWidth;
+                    const handle1Width = 4;
+                    const newWidth = e.clientX - containerRect.left - projectsWidth - handle1Width;
+                    if (newWidth >= 200 && newWidth <= 600) {
+                        inputSection.style.width = newWidth + 'px';
+                    }
+                }
+            }
+
+            function stopResize() {
+                isResizing = false;
+                currentHandle = null;
+                document.body.style.cursor = '';
+                document.body.style.userSelect = '';
+            }
+
+            if (handle1) {
+                handle1.addEventListener('mousedown', (e) => startResize(e, handle1));
+            }
+            if (handle2) {
+                handle2.addEventListener('mousedown', (e) => startResize(e, handle2));
+            }
+
+            document.addEventListener('mousemove', resize);
+            document.addEventListener('mouseup', stopResize);
+        }
+
+        // Initialize resize on app load
+        initResize();
+
+        // PWA Service Worker Registration - DISABLED FOR DEVELOPMENT
+        // if ('serviceWorker' in navigator) {
+        //     window.addEventListener('load', () => {
+        //         navigator.serviceWorker.register('/service-worker.js')
+        //             .then(registration => console.log('SW registered:', registration))
+        //             .catch(error => console.log('SW registration failed:', error));
+        //     });
+        // }
+
+        // Initialize
+        checkAuth();
+    </script>
+</body>
+</html>
