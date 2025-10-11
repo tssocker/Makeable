@@ -243,6 +243,10 @@ app.post('/api/generate', authMiddleware, async (req, res) => {
     const authReq = req as AuthRequest;
     const userId = authReq.userId;
 
+    if (!userId) {
+      return res.status(401).json({ error: 'User not authenticated' });
+    }
+
     const id = projectId || `project_${Date.now()}`;
     const name = prompt.slice(0, 50); // First 50 chars as name
 

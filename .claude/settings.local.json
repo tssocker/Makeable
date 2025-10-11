@@ -14,7 +14,11 @@
       "Bash(git init:*)",
       "Bash(gh auth:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(npx react-native:*)",
+      "Read(//Users/till/**)",
+      "Bash(pod install:*)",
+      "Bash(sudo gem install:*)"
     ],
     "deny": [],
     "ask": []
