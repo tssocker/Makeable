@@ -55,13 +55,13 @@ try {
 // Auth endpoints
 app.post('/api/auth/register', async (req, res) => {
   try {
-    const { email, password, name } = req.body;
+    const { email, password, name, role } = req.body;
 
     if (!email || !password || !name) {
       return res.status(400).json({ error: 'Email, password, and name are required' });
     }
 
-    const user = await userStorage.createUser(email, password, name);
+    const user = await userStorage.createUser(email, password, name, role || 'student');
     const token = generateToken(user.id);
 
     res.cookie('token', token, {
@@ -76,7 +76,8 @@ app.post('/api/auth/register', async (req, res) => {
         id: user.id,
         email: user.email,
         name: user.name,
-        profilePicture: user.profilePicture
+        profilePicture: user.profilePicture,
+        role: user.role
       },
       token
     });
@@ -115,7 +116,8 @@ app.post('/api/auth/login', async (req, res) => {
         id: user.id,
         email: user.email,
         name: user.name,
-        profilePicture: user.profilePicture
+        profilePicture: user.profilePicture,
+        role: user.role
       },
       token
     });
@@ -140,7 +142,8 @@ app.get('/api/auth/me', authMiddleware, async (req: AuthRequest, res) => {
     id: user.id,
     email: user.email,
     name: user.name,
-    profilePicture: user.profilePicture
+    profilePicture: user.profilePicture,
+    role: user.role
   });
 });
 
@@ -163,7 +166,8 @@ app.patch('/api/auth/profile', authMiddleware, async (req: AuthRequest, res) => 
         id: updatedUser.id,
         email: updatedUser.email,
         name: updatedUser.name,
-        profilePicture: updatedUser.profilePicture
+        profilePicture: updatedUser.profilePicture,
+        role: updatedUser.role
       }
     });
   } catch (error) {
@@ -190,6 +194,76 @@ app.patch('/api/auth/password', authMiddleware, async (req: AuthRequest, res) =>
     console.error('Password update error:', error);
     res.status(500).json({ error: 'Failed to update password' });
   }
+});
+
+// Admin middleware
+const adminMiddleware = async (req: AuthRequest, res: any, next: any) => {
+  const user = userStorage.findById(req.userId!);
+  if (!user || user.role !== 'admin') {
+    return res.status(403).json({ error: 'Admin access required' });
+  }
+  next();
+};
+
+// Admin endpoints
+app.get('/api/admin/users', authMiddleware, adminMiddleware, async (req, res) => {
+  const users = userStorage.getAllUsers().map(u => ({
+    id: u.id,
+    email: u.email,
+    name: u.name,
+    role: u.role,
+    createdAt: u.createdAt,
+    profilePicture: u.profilePicture
+  }));
+  res.json({ users });
+});
+
+app.get('/api/admin/projects', authMiddleware, adminMiddleware, async (req, res) => {
+  const allProjects = Array.from(projects.values()).map(p => {
+    const user = userStorage.findById(p.userId);
+    return {
+      id: p.id,
+      name: p.name,
+      prompt: p.prompt,
+      createdAt: p.createdAt,
+      userId: p.userId,
+      userName: user?.name || 'Unknown',
+      userEmail: user?.email || 'Unknown'
+    };
+  });
+  res.json({ projects: allProjects });
+});
+
+app.get('/api/admin/projects/:id', authMiddleware, adminMiddleware, async (req, res) => {
+  const project = projects.get(req.params.id);
+  if (!project) {
+    return res.status(404).json({ error: 'Project not found' });
+  }
+  const user = userStorage.findById(project.userId);
+  res.json({
+    ...project,
+    userName: user?.name || 'Unknown',
+    userEmail: user?.email || 'Unknown'
+  });
+});
+
+app.get('/api/admin/stats', authMiddleware, adminMiddleware, async (req, res) => {
+  const allUsers = userStorage.getAllUsers();
+  const allProjects = Array.from(projects.values());
+
+  const stats = {
+    totalUsers: allUsers.length,
+    totalStudents: allUsers.filter(u => u.role === 'student').length,
+    totalAdmins: allUsers.filter(u => u.role === 'admin').length,
+    totalProjects: allProjects.length,
+    projectsPerUser: {} as Record<string, number>
+  };
+
+  allProjects.forEach(p => {
+    stats.projectsPerUser[p.userId] = (stats.projectsPerUser[p.userId] || 0) + 1;
+  });
+
+  res.json(stats);
 });
 
 // Get all projects

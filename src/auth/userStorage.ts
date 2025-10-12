@@ -8,6 +8,7 @@ export interface User {
   passwordHash: string;
   name: string;
   profilePicture?: string;
+  role: 'admin' | 'student';
   createdAt: string;
 }
 
@@ -48,7 +49,7 @@ class UserStorage {
     fs.writeFileSync(USERS_FILE, JSON.stringify(usersObj, null, 2));
   }
 
-  async createUser(email: string, password: string, name: string): Promise<User> {
+  async createUser(email: string, password: string, name: string, role: 'admin' | 'student' = 'student'): Promise<User> {
     if (this.findByEmail(email)) {
       throw new Error('User with this email already exists');
     }
@@ -59,12 +60,17 @@ class UserStorage {
       email: email.toLowerCase(),
       passwordHash,
       name,
+      role,
       createdAt: new Date().toISOString()
     };
 
     this.users.set(user.id, user);
     this.save();
     return user;
+  }
+
+  getAllUsers(): User[] {
+    return Array.from(this.users.values());
   }
 
   findByEmail(email: string): User | undefined {

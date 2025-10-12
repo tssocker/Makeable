@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#FF6B9D">
+    <!-- Admin Dashboard v2.0 -->
     <meta name="description" content="Makeable - AI App Builder. If you can imagine it, we can make it.">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -346,6 +347,29 @@
 
         .landing-sidebar-footer .user-profile:hover {
             background: rgba(255, 255, 255, 0.15);
+        }
+
+        .admin-link {
+            display: none;
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            border-radius: 10px;
+            color: white;
+            text-decoration: none;
+            text-align: center;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .admin-link.show {
+            display: block;
+        }
+
+        .admin-link:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
         }
 
         .landing-main {
@@ -1291,6 +1315,7 @@
                 <!-- Projects will be loaded here -->
             </div>
             <div class="landing-sidebar-footer">
+                <a href="/admin.html" class="admin-link" id="admin-link">📊 Admin Dashboard</a>
                 <div class="user-profile" id="landing-user-profile">
                     <div class="user-avatar" id="landing-user-avatar"></div>
                     <div class="user-info">
@@ -1615,6 +1640,11 @@
 
             document.getElementById('profile-name').value = currentUser.name;
             document.getElementById('profile-picture').value = currentUser.profilePicture || '';
+
+            // Show admin link if user is admin
+            if (currentUser.role === 'admin') {
+                document.getElementById('admin-link').classList.add('show');
+            }
         }
 
         // Load projects for landing page sidebar
