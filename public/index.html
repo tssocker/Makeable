@@ -1494,11 +1494,6 @@
 
         function showLandingPage() {
             authScreen.style.display = 'none';
-            // Redirect admins to dashboard
-            if (currentUser && currentUser.role === 'admin') {
-                window.location.href = '/admin.html';
-                return;
-            }
             landingPage.classList.add('active');
             appContainer.classList.remove('active');
         }
@@ -1548,7 +1543,12 @@
                     status.className = 'auth-status success show';
                     setTimeout(() => {
                         updateUserProfile();
-                        showLandingPage();
+                        // Redirect admins to dashboard, students to landing page
+                        if (currentUser.role === 'admin') {
+                            window.location.href = '/admin.html';
+                        } else {
+                            showLandingPage();
+                        }
                     }, 1000);
                 } else {
                     status.textContent = data.error || 'Login failed';

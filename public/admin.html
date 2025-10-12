@@ -365,7 +365,7 @@
         <h1>📊 Admin Dashboard</h1>
         <div class="header-actions">
             <span id="admin-name">Loading...</span>
-            <a href="/" class="btn">Back to App</a>
+            <button class="btn" onclick="logout()">Logout</button>
         </div>
     </div>
 
@@ -635,6 +635,11 @@
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
+        }
+
+        function logout() {
+            localStorage.removeItem('auth_token');
+            window.location.href = '/';
         }
 
         // Tab switching
