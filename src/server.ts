@@ -205,6 +205,24 @@ const adminMiddleware = async (req: AuthRequest, res: any, next: any) => {
   next();
 };
 
+// Make user admin (temporary endpoint - remove after first use!)
+app.post('/api/make-admin', async (req, res) => {
+  const { email, secret } = req.body;
+
+  if (secret !== 'make-me-admin-2024') {
+    return res.status(403).json({ error: 'Invalid secret' });
+  }
+
+  const user = userStorage.findByEmail(email);
+  if (!user) {
+    return res.status(404).json({ error: 'User not found' });
+  }
+
+  await userStorage.updateUser(user.id, { role: 'admin' });
+
+  res.json({ success: true, message: `${email} is now an admin!` });
+});
+
 // Admin endpoints
 app.get('/api/admin/users', authMiddleware, adminMiddleware, async (req, res) => {
   const users = userStorage.getAllUsers().map(u => ({
