@@ -1,0 +1,26 @@
+{
+  "1759866524572": {
+    "id": "1759866524572",
+    "email": "s_tischa@hochschule-bc.de",
+    "passwordHash": "$2b$10$B85CZVL8/jcPaAG5b3B2ZOM1oQaLBjOQuxvDFYP/CxY0tEfzH8Efa",
+    "name": "Till",
+    "role": "admin",
+    "createdAt": "2025-10-07T19:48:44.572Z"
+  },
+  "1760554779512": {
+    "id": "1760554779512",
+    "email": "admin1",
+    "passwordHash": "$2b$10$EjKVIV4RPnANdHOetrvTuORkFRytnXtpo.4W3YXUUT6Xhfq4HmXkq",
+    "name": "Admin 1",
+    "role": "admin",
+    "createdAt": "2025-10-15T18:59:39.512Z"
+  },
+  "1760554798643": {
+    "id": "1760554798643",
+    "email": "admin2",
+    "passwordHash": "$2b$10$r/MTuChAPYDIsEG01lIo6OFJ13BKUSEfafqQOoawdo63P9LtUiosS",
+    "name": "Admin 2",
+    "role": "admin",
+    "createdAt": "2025-10-15T18:59:58.643Z"
+  }
+}
