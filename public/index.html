@@ -2519,7 +2519,8 @@
                 landingPrompt.value = '';
                 landingFiles = [];
                 updateFilePreview('landing-file-preview', landingFiles);
-                document.getElementById('landing-file-input').value = '';
+                const landingFileInput = document.getElementById('landing-file-input');
+                if (landingFileInput) landingFileInput.value = '';
             } catch (e) {
                 showStatus('❌ ' + e.message, 'error');
             } finally {
@@ -2557,7 +2558,8 @@
                 // Clear files after successful generation
                 appFiles = [];
                 updateFilePreview('app-file-preview', appFiles);
-                document.getElementById('app-file-input').value = '';
+                const appFileInput = document.getElementById('app-file-input');
+                if (appFileInput) appFileInput.value = '';
 
                 // Create code viewer
                 createCodeViewer(data.project.files, 'code-viewer');
