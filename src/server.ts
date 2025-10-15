@@ -54,6 +54,49 @@ try {
 }
 
 // Auth endpoints
+// Special setup endpoint - creates first admin user (only works if no users exist)
+app.post('/api/auth/setup-admin', async (req, res) => {
+  try {
+    const { email, password, name } = req.body;
+
+    if (!email || !password || !name) {
+      return res.status(400).json({ error: 'Email, password, and name are required' });
+    }
+
+    // Check if any users already exist
+    const existingUsers = userStorage.getAllUsers();
+    if (existingUsers.length > 0) {
+      return res.status(403).json({ error: 'Admin setup already completed' });
+    }
+
+    // Create admin user
+    const user = await userStorage.createUser(email, password, name, 'admin');
+    const token = generateToken(user.id);
+
+    res.cookie('token', token, {
+      httpOnly: true,
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+      sameSite: 'lax'
+    });
+
+    res.json({
+      success: true,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role
+      },
+      token
+    });
+  } catch (error) {
+    console.error('Admin setup error:', error);
+    res.status(400).json({
+      error: error instanceof Error ? error.message : 'Admin setup failed'
+    });
+  }
+});
+
 app.post('/api/auth/register', async (req, res) => {
   try {
     const { email, password, name, role, course } = req.body;
