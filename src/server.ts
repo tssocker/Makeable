@@ -339,7 +339,7 @@ app.delete('/api/projects/:id', authMiddleware, async (req, res) => {
     }
 
     // Security: Only allow deleting own projects (or admin can delete any)
-    const user = users.get(userId!);
+    const user = userStorage.findById(userId!);
     if (project.userId !== userId && user?.role !== 'admin') {
       return res.status(403).json({ error: 'Access denied' });
     }
