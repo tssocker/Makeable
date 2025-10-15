@@ -2710,6 +2710,9 @@
         function updateFilePreview(previewId, filesArray) {
             const container = document.getElementById(previewId);
 
+            // Check if container exists (might be commented out)
+            if (!container) return;
+
             if (filesArray.length === 0) {
                 container.classList.remove('has-files');
                 container.innerHTML = '';
@@ -2783,9 +2786,9 @@
             return Promise.all(promises);
         }
 
-        // Setup file uploads
-        setupFileUpload('landing-file-input', 'landing-file-preview', landingFiles);
-        setupFileUpload('app-file-input', 'app-file-preview', appFiles);
+        // Setup file uploads - temporarily disabled
+        // setupFileUpload('landing-file-input', 'landing-file-preview', landingFiles);
+        // setupFileUpload('app-file-input', 'app-file-preview', appFiles);
 
         // Fullscreen toggle
         function toggleFullscreen() {
