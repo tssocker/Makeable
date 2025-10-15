@@ -398,7 +398,7 @@ app.delete('/api/projects/:id', authMiddleware, async (req, res) => {
 // Create new project
 app.post('/api/generate', authMiddleware, async (req, res) => {
   try {
-    const { prompt, projectId } = req.body;
+    const { prompt, projectId, files } = req.body;
 
     if (!prompt) {
       return res.status(400).json({ error: 'Prompt is required' });
@@ -549,7 +549,7 @@ app.post('/api/generate', authMiddleware, async (req, res) => {
           }]
         };
       } else {
-        result = await createApp(prompt);
+        result = await createApp(prompt, undefined, files);
       }
 
       // Update project with generated files
@@ -665,7 +665,7 @@ app.post('/api/projects/:id/iterate', authMiddleware, async (req, res) => {
   try {
     const authReq = req as AuthRequest;
     const userId = authReq.userId;
-    const { prompt } = req.body;
+    const { prompt, files } = req.body;
     const projectId = req.params.id;
 
     const existingProject = projects.get(projectId);
@@ -680,8 +680,8 @@ app.post('/api/projects/:id/iterate', authMiddleware, async (req, res) => {
 
     console.log('Iterating on project:', projectId, 'with prompt:', prompt);
 
-    // Pass existing files to createApp for context-aware updates
-    const result = await createApp(prompt, existingProject.files);
+    // Pass existing files and uploaded files to createApp for context-aware updates
+    const result = await createApp(prompt, existingProject.files, files);
 
     // Update project
     existingProject.files = result.files;

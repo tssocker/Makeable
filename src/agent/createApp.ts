@@ -135,7 +135,11 @@ async function processMessageContent(content: any): Promise<any> {
   return content;
 }
 
-export async function createApp(prompt: string, existingFiles?: GeneratedFile[]): Promise<AppGenerationResult> {
+export async function createApp(
+  prompt: string,
+  existingFiles?: GeneratedFile[],
+  uploadedFiles?: Array<{ name: string; type: string; data: string }>
+): Promise<AppGenerationResult> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
 
   if (!apiKey) {
@@ -192,9 +196,40 @@ Create a fully functional app that matches the user's request.`;
       userMessage = `Here are the current files of the app:\n\n${filesContext}\n\nUser's modification request: ${prompt}`;
     }
 
-    // Process the user message content to handle any images
-    const processedContent = await processMessageContent(userMessage);
-    
+    // Build content array with text and uploaded files
+    let messageContent: any[] = [{ type: 'text', text: userMessage }];
+
+    // Add uploaded files to the message
+    if (uploadedFiles && uploadedFiles.length > 0) {
+      for (const file of uploadedFiles) {
+        if (file.type.startsWith('image/')) {
+          // Extract base64 data (remove data:image/...;base64, prefix)
+          const base64Data = file.data.split(',')[1];
+
+          // Determine media type
+          let mediaType: 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp' = 'image/jpeg';
+          if (file.type.includes('png')) mediaType = 'image/png';
+          else if (file.type.includes('gif')) mediaType = 'image/gif';
+          else if (file.type.includes('webp')) mediaType = 'image/webp';
+
+          messageContent.push({
+            type: 'image',
+            source: {
+              type: 'base64',
+              media_type: mediaType,
+              data: base64Data
+            }
+          });
+        } else {
+          // For non-image files, include them as text context
+          messageContent[0].text += `\n\n[User provided file: ${file.name}]`;
+        }
+      }
+    }
+
+    // Process the message content to handle oversized images
+    const processedContent = await processMessageContent(messageContent);
+
     let messages: Anthropic.MessageParam[] = [
       {
         role: 'user',

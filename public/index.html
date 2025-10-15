@@ -543,6 +543,107 @@
             box-shadow: 0 0 0 3px rgba(255, 107, 157, 0.1);
         }
 
+        .file-upload-section {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 2px dashed #e0e0e0;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload-section:hover {
+            border-color: var(--makeable-pink);
+            background: #fff;
+        }
+
+        .file-upload-label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .file-preview-container {
+            display: none;
+            margin-top: 1rem;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .file-preview-container.has-files {
+            display: flex;
+        }
+
+        .file-preview-item {
+            position: relative;
+            padding: 0.75rem;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            max-width: 100%;
+        }
+
+        .file-preview-item img {
+            max-width: 60px;
+            max-height: 60px;
+            border-radius: 4px;
+            object-fit: cover;
+        }
+
+        .file-preview-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .file-preview-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #333;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .file-preview-size {
+            font-size: 0.75rem;
+            color: #666;
+        }
+
+        .file-remove-btn {
+            padding: 0.25rem 0.5rem;
+            background: #ff5252;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all 0.2s;
+        }
+
+        .file-remove-btn:hover {
+            background: #ff1744;
+        }
+
         .landing-button {
             width: 100%;
             padding: 1.25rem;
@@ -1137,6 +1238,50 @@
             align-items: center;
         }
 
+        .fullscreen-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: transparent;
+            color: #666;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-left: 0.5rem;
+        }
+
+        .fullscreen-btn:hover {
+            background: #f5f5f5;
+        }
+
+        .fullscreen-mode .preview-section {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 10000;
+            background: white;
+        }
+
+        .fullscreen-mode .preview-header {
+            background: linear-gradient(135deg, var(--makeable-purple) 0%, var(--makeable-pink) 100%);
+            color: white;
+        }
+
+        .fullscreen-mode .fullscreen-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .fullscreen-mode .fullscreen-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
         .view-toggle-group {
             display: flex;
             gap: 0.5rem;
@@ -1545,6 +1690,11 @@
                 <!-- Student Input Container -->
                 <div class="landing-input-container" id="student-input-container" style="display: none;">
                     <textarea id="landing-prompt" class="landing-textarea" placeholder="Just make it happen"></textarea>
+                    <div class="file-upload-section">
+                        <label class="file-upload-label">📎 Add files or images (optional)</label>
+                        <input type="file" id="landing-file-input" class="file-input" multiple accept="image/*,.pdf,.doc,.docx,.txt">
+                        <div id="landing-file-preview" class="file-preview-container"></div>
+                    </div>
                     <button id="landing-button" class="landing-button">Create App</button>
                     <div id="landing-status" class="status hidden"></div>
                     <div id="landing-code-viewer" style="display: none;"></div>
@@ -1593,6 +1743,11 @@
             <div class="input-section" id="app-input-section">
                 <label for="prompt" id="prompt-label">Describe your app:</label>
                 <textarea id="prompt" placeholder="Example: Create a simple todo list app"></textarea>
+                <div class="file-upload-section">
+                    <label class="file-upload-label">📎 Add files or images (optional)</label>
+                    <input type="file" id="app-file-input" class="file-input" multiple accept="image/*,.pdf,.doc,.docx,.txt">
+                    <div id="app-file-preview" class="file-preview-container"></div>
+                </div>
                 <button id="generate-btn">Generate App</button>
                 <div id="status" class="status hidden"></div>
                 <div id="code-viewer" style="display: none;"></div>
@@ -1601,14 +1756,20 @@
             <div class="preview-section">
                 <div class="preview-header">
                     <span>Preview</span>
-                    <div class="view-toggle-group">
-                        <button class="view-toggle-btn active" id="web-view-btn" onclick="switchToWebView()">
-                            <span>🖥️</span>
-                            <span>Web</span>
-                        </button>
-                        <button class="view-toggle-btn" id="iphone-view-btn" onclick="switchToIPhoneView()">
-                            <span>📱</span>
-                            <span>iPhone</span>
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <div class="view-toggle-group">
+                            <button class="view-toggle-btn active" id="web-view-btn" onclick="switchToWebView()">
+                                <span>🖥️</span>
+                                <span>Web</span>
+                            </button>
+                            <button class="view-toggle-btn" id="iphone-view-btn" onclick="switchToIPhoneView()">
+                                <span>📱</span>
+                                <span>iPhone</span>
+                            </button>
+                        </div>
+                        <button class="fullscreen-btn" id="fullscreen-btn" onclick="toggleFullscreen()">
+                            <span id="fullscreen-icon">⛶</span>
+                            <span id="fullscreen-text">Fullscreen</span>
                         </button>
                     </div>
                 </div>
@@ -1656,6 +1817,8 @@
         let currentProjectId = null;
         let renamingProjectId = null;
         let currentUser = null;
+        let landingFiles = [];
+        let appFiles = [];
 
         // DOM Elements
         const authScreen = document.getElementById('auth-screen');
@@ -2291,11 +2454,14 @@
             showStatus('🎨 Creating your app... This may take a moment', 'loading');
 
             try {
+                // Convert files to base64 if any
+                const filesData = landingFiles.length > 0 ? await convertFilesToBase64(landingFiles) : [];
+
                 // Create project immediately
                 const r = await fetchWithAuth(`${API_URL}/api/generate`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ prompt })
+                    body: JSON.stringify({ prompt, files: filesData })
                 });
                 const data = await r.json();
                 if (!r.ok) throw new Error(data.error || 'Failed to generate app');
@@ -2345,8 +2511,11 @@
                     clearInterval(pollInterval);
                 }, 300000);
 
-                // Clear the landing prompt for next time
+                // Clear the landing prompt and files for next time
                 landingPrompt.value = '';
+                landingFiles = [];
+                updateFilePreview('landing-file-preview', landingFiles);
+                document.getElementById('landing-file-input').value = '';
             } catch (e) {
                 showStatus('❌ ' + e.message, 'error');
             } finally {
@@ -2364,19 +2533,27 @@
             showStatus('Generating your app', 'loading');
             document.getElementById('code-viewer').style.display = 'none';
             try {
+                // Convert files to base64 if any
+                const filesData = appFiles.length > 0 ? await convertFilesToBase64(appFiles) : [];
+
                 const url = currentProjectId
                     ? `${API_URL}/api/projects/${currentProjectId}/iterate`
                     : `${API_URL}/api/generate`;
                 const r = await fetchWithAuth(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ prompt })
+                    body: JSON.stringify({ prompt, files: filesData })
                 });
                 const data = await r.json();
                 if (!r.ok) throw new Error(data.error || 'Failed to generate app');
                 showStatus('App generated successfully!', 'success');
                 currentProjectId = data.project.id;
                 promptInput.value = '';
+
+                // Clear files after successful generation
+                appFiles = [];
+                updateFilePreview('app-file-preview', appFiles);
+                document.getElementById('app-file-input').value = '';
 
                 // Create code viewer
                 createCodeViewer(data.project.files, 'code-viewer');
@@ -2507,6 +2684,128 @@
 
         // Initialize resize on app load
         initResize();
+
+        // File upload handling
+        function setupFileUpload(inputId, previewId, filesArray) {
+            const fileInput = document.getElementById(inputId);
+            const filePreview = document.getElementById(previewId);
+
+            fileInput.addEventListener('change', (e) => {
+                const files = Array.from(e.target.files);
+                files.forEach(file => {
+                    if (file.size > 5 * 1024 * 1024) { // 5MB limit
+                        alert(`File ${file.name} is too large. Maximum size is 5MB.`);
+                        return;
+                    }
+                    filesArray.push(file);
+                });
+                updateFilePreview(previewId, filesArray);
+            });
+        }
+
+        function updateFilePreview(previewId, filesArray) {
+            const container = document.getElementById(previewId);
+
+            if (filesArray.length === 0) {
+                container.classList.remove('has-files');
+                container.innerHTML = '';
+                return;
+            }
+
+            container.classList.add('has-files');
+            container.innerHTML = '';
+
+            filesArray.forEach((file, index) => {
+                const item = document.createElement('div');
+                item.className = 'file-preview-item';
+
+                const isImage = file.type.startsWith('image/');
+
+                if (isImage) {
+                    const img = document.createElement('img');
+                    img.src = URL.createObjectURL(file);
+                    item.appendChild(img);
+                }
+
+                const info = document.createElement('div');
+                info.className = 'file-preview-info';
+
+                const name = document.createElement('div');
+                name.className = 'file-preview-name';
+                name.textContent = file.name;
+
+                const size = document.createElement('div');
+                size.className = 'file-preview-size';
+                size.textContent = formatFileSize(file.size);
+
+                info.appendChild(name);
+                info.appendChild(size);
+                item.appendChild(info);
+
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'file-remove-btn';
+                removeBtn.textContent = '✕';
+                removeBtn.onclick = () => {
+                    filesArray.splice(index, 1);
+                    updateFilePreview(previewId, filesArray);
+                };
+                item.appendChild(removeBtn);
+
+                container.appendChild(item);
+            });
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
+        async function convertFilesToBase64(files) {
+            const promises = files.map(file => {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                        resolve({
+                            name: file.name,
+                            type: file.type,
+                            data: reader.result
+                        });
+                    };
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+            });
+            return Promise.all(promises);
+        }
+
+        // Setup file uploads
+        setupFileUpload('landing-file-input', 'landing-file-preview', landingFiles);
+        setupFileUpload('app-file-input', 'app-file-preview', appFiles);
+
+        // Fullscreen toggle
+        function toggleFullscreen() {
+            const previewSection = document.querySelector('.preview-section');
+            const fullscreenIcon = document.getElementById('fullscreen-icon');
+            const fullscreenText = document.getElementById('fullscreen-text');
+
+            if (document.body.classList.contains('fullscreen-mode')) {
+                document.body.classList.remove('fullscreen-mode');
+                fullscreenIcon.textContent = '⛶';
+                fullscreenText.textContent = 'Fullscreen';
+            } else {
+                document.body.classList.add('fullscreen-mode');
+                fullscreenIcon.textContent = '✕';
+                fullscreenText.textContent = 'Exit';
+            }
+        }
+
+        // ESC key to exit fullscreen
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && document.body.classList.contains('fullscreen-mode')) {
+                toggleFullscreen();
+            }
+        });
 
         // PWA Service Worker Registration - DISABLED FOR DEVELOPMENT
         // if ('serviceWorker' in navigator) {
