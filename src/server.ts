@@ -54,7 +54,7 @@ try {
 }
 
 // Auth endpoints
-// Special setup endpoint - creates first admin user (only works if no users exist)
+// Special setup endpoint - creates admin users (allows multiple admin creations)
 app.post('/api/auth/setup-admin', async (req, res) => {
   try {
     const { email, password, name } = req.body;
@@ -63,13 +63,7 @@ app.post('/api/auth/setup-admin', async (req, res) => {
       return res.status(400).json({ error: 'Email, password, and name are required' });
     }
 
-    // Check if any users already exist
-    const existingUsers = userStorage.getAllUsers();
-    if (existingUsers.length > 0) {
-      return res.status(403).json({ error: 'Admin setup already completed' });
-    }
-
-    // Create admin user
+    // Create admin user (no restriction on number of admins)
     const user = await userStorage.createUser(email, password, name, 'admin');
     const token = generateToken(user.id);
 

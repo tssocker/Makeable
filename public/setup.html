@@ -132,24 +132,24 @@
 <body>
     <div class="setup-container">
         <h1>🚀 Admin Setup</h1>
-        <p class="subtitle">Erstelle deinen Admin-Account für Makeable</p>
+        <p class="subtitle">Erstelle einen Admin-Account für Makeable</p>
 
         <div class="info-box">
-            <p><strong>Hinweis:</strong> Dieser Setup funktioniert nur beim ersten Aufruf. Danach kannst du dich normal einloggen.</p>
+            <p><strong>Hinweis:</strong> Diese Seite erlaubt es Lehrenden, sich als Admin zu registrieren. Nach der Registrierung kannst du dich normal einloggen.</p>
         </div>
 
         <form id="setup-form">
             <div class="form-group">
                 <label for="name">Name</label>
-                <input type="text" id="name" required value="Till">
+                <input type="text" id="name" required placeholder="z.B. Till">
             </div>
             <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" required value="s_tischa@hochschule-bc.de">
+                <label for="email">Email oder Benutzername</label>
+                <input type="text" id="email" required placeholder="z.B. s_tischa@hochschule-bc.de oder admin1">
             </div>
             <div class="form-group">
                 <label for="password">Passwort</label>
-                <input type="password" id="password" required minlength="6">
+                <input type="password" id="password" required minlength="6" placeholder="Mindestens 6 Zeichen">
             </div>
             <button type="submit" id="submit-btn">Admin Account erstellen</button>
         </form>
