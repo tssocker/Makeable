@@ -9,7 +9,7 @@ export interface User {
   name: string;
   profilePicture?: string;
   role: 'admin' | 'student';
-  course?: 'Design Thinking' | 'Prof. Wamsler Projekt'; // Only for students
+  course?: 'Design Thinking' | 'Prof. Wamsler Projekt' | 'andere Module'; // Only for students
   createdAt: string;
 }
 
@@ -50,7 +50,7 @@ class UserStorage {
     fs.writeFileSync(USERS_FILE, JSON.stringify(usersObj, null, 2));
   }
 
-  async createUser(email: string, password: string, name: string, role: 'admin' | 'student' = 'student', course?: 'Design Thinking' | 'Prof. Wamsler Projekt'): Promise<User> {
+  async createUser(email: string, password: string, name: string, role: 'admin' | 'student' = 'student', course?: 'Design Thinking' | 'Prof. Wamsler Projekt' | 'andere Module'): Promise<User> {
     if (this.findByEmail(email)) {
       throw new Error('User with this email already exists');
     }
