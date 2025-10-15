@@ -379,6 +379,17 @@
             justify-content: center;
             padding: 2rem;
             position: relative;
+            flex: 1;
+            width: 100%;
+        }
+
+        .landing-content-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 100%;
         }
 
         .projects-toggle-btn {
@@ -556,6 +567,27 @@
             opacity: 0.6;
             cursor: not-allowed;
             transform: none;
+        }
+
+        .admin-dashboard-link {
+            display: inline-block;
+            padding: 1.25rem 3rem;
+            background: linear-gradient(135deg, var(--makeable-pink) 0%, var(--makeable-orange) 100%);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 157, 0.4);
+        }
+
+        .admin-dashboard-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 157, 0.6);
+            border-color: rgba(255, 255, 255, 0.5);
         }
 
         /* App Container Styles */
@@ -1002,6 +1034,31 @@
             transform: scale(1.1);
         }
 
+        .delete-btn {
+            background: rgba(255,82,82,0.2);
+            border: none;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+            margin-left: 0.25rem;
+        }
+
+        .project-item.active .delete-btn {
+            background: rgba(255,82,82,0.3);
+            color: white;
+        }
+
+        .project-item:not(.active) .delete-btn {
+            color: #ff5252;
+        }
+
+        .delete-btn:hover {
+            transform: scale(1.1);
+            background: rgba(255,82,82,0.4);
+        }
+
         .rename-input {
             width: 100%;
             padding: 0.5rem;
@@ -1075,12 +1132,142 @@
             font-weight: 700;
             color: #333;
             font-size: 1.1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .view-toggle-group {
+            display: flex;
+            gap: 0.5rem;
+            background: white;
+            padding: 0.25rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .view-toggle-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: transparent;
+            color: #666;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .view-toggle-btn:hover {
+            background: #f5f5f5;
+        }
+
+        .view-toggle-btn.active {
+            background: linear-gradient(135deg, var(--makeable-pink) 0%, var(--makeable-orange) 100%);
+            color: white;
+            box-shadow: 0 2px 8px rgba(255, 107, 157, 0.3);
+        }
+
+        .preview-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f5f5f5;
+            padding: 2rem;
+            overflow: auto;
+            transition: all 0.3s ease;
+        }
+
+        .preview-container.web-view {
+            padding: 0;
+            background: white;
+        }
+
+        .iphone-frame {
+            position: relative;
+            width: 390px;
+            height: 844px;
+            background: #1f1f1f;
+            border-radius: 50px;
+            padding: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1);
+            display: none;
+        }
+
+        .preview-container.iphone-view .iphone-frame {
+            display: block;
+        }
+
+        .iphone-notch {
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 30px;
+            background: #1f1f1f;
+            border-radius: 0 0 20px 20px;
+            z-index: 10;
+        }
+
+        .iphone-notch::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 6px;
+            background: #333;
+            border-radius: 3px;
+        }
+
+        .iphone-notch::after {
+            content: '';
+            position: absolute;
+            top: 8px;
+            right: 20px;
+            width: 12px;
+            height: 12px;
+            background: #1a1a2e;
+            border-radius: 50%;
+            box-shadow: 0 0 4px rgba(100, 200, 255, 0.5);
+        }
+
+        .iphone-screen {
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 40px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .iphone-frame iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: white;
         }
 
         #preview-frame {
             flex: 1;
             border: none;
             background: white;
+            width: 100%;
+            height: 100%;
+        }
+
+        .preview-container.web-view #preview-frame {
+            display: block;
+        }
+
+        .preview-container.iphone-view > #preview-frame {
+            display: none;
         }
 
         .status {
@@ -1295,6 +1482,15 @@
                     <input type="password" class="form-input" id="register-password" required>
                     <div class="form-error" id="register-password-error"></div>
                 </div>
+                <div class="form-group">
+                    <label class="form-label" for="register-course">Kurs</label>
+                    <select class="form-input" id="register-course" required>
+                        <option value="">Bitte wählen...</option>
+                        <option value="Design Thinking">Design Thinking</option>
+                        <option value="Prof. Wamsler Projekt">Prof. Wamsler Projekt</option>
+                    </select>
+                    <div class="form-error" id="register-course-error"></div>
+                </div>
                 <button type="submit" class="auth-button" id="register-btn">Register</button>
                 <div class="auth-status" id="register-status"></div>
             </form>
@@ -1329,22 +1525,35 @@
                 <span id="projects-toggle-icon">📂</span>
                 <span>Projects</span>
             </button>
-            <div class="landing-header">
-                <h1>
-                    <div class="logo-shapes">
-                        <div class="shape shape-square"></div>
-                        <div class="shape shape-circle"></div>
-                        <div class="shape shape-arch"></div>
-                    </div>
-                    <strong>Makeable</strong>
-                </h1>
-                <p>If you can imagine it, we can make it.</p>
-            </div>
-            <div class="landing-input-container">
-                <textarea id="landing-prompt" class="landing-textarea" placeholder="Just make it happen"></textarea>
-                <button id="landing-button" class="landing-button">Create App</button>
-                <div id="landing-status" class="status hidden"></div>
-                <div id="landing-code-viewer" style="display: none;"></div>
+            <a href="/admin.html" class="projects-toggle-btn" id="admin-dashboard-btn" style="display: none; position: absolute; top: 2rem; right: 2rem; text-decoration: none;">
+                <span>📊</span>
+                <span>Admin Dashboard</span>
+            </a>
+            <div class="landing-content-wrapper">
+                <div class="landing-header">
+                    <h1>
+                        <div class="logo-shapes">
+                            <div class="shape shape-square"></div>
+                            <div class="shape shape-circle"></div>
+                            <div class="shape shape-arch"></div>
+                        </div>
+                        <strong>Makeable</strong>
+                    </h1>
+                    <p>If you can imagine it, we can make it.</p>
+                </div>
+                <!-- Student Input Container -->
+                <div class="landing-input-container" id="student-input-container" style="display: none;">
+                    <textarea id="landing-prompt" class="landing-textarea" placeholder="Just make it happen"></textarea>
+                    <button id="landing-button" class="landing-button">Create App</button>
+                    <div id="landing-status" class="status hidden"></div>
+                    <div id="landing-code-viewer" style="display: none;"></div>
+                </div>
+                <!-- Admin Dashboard Button -->
+                <div id="admin-dashboard-container" style="display: none;">
+                    <a href="/admin.html" class="admin-dashboard-link">
+                        Dashboard
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -1389,8 +1598,28 @@
             </div>
             <div class="resize-handle" id="resize-handle-2"></div>
             <div class="preview-section">
-                <div class="preview-header">Preview</div>
-                <iframe id="preview-frame"></iframe>
+                <div class="preview-header">
+                    <span>Preview</span>
+                    <div class="view-toggle-group">
+                        <button class="view-toggle-btn active" id="web-view-btn" onclick="switchToWebView()">
+                            <span>🖥️</span>
+                            <span>Web</span>
+                        </button>
+                        <button class="view-toggle-btn" id="iphone-view-btn" onclick="switchToIPhoneView()">
+                            <span>📱</span>
+                            <span>iPhone</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="preview-container web-view" id="preview-container">
+                    <div class="iphone-frame">
+                        <div class="iphone-notch"></div>
+                        <div class="iphone-screen">
+                            <iframe id="preview-frame-iphone"></iframe>
+                        </div>
+                    </div>
+                    <iframe id="preview-frame"></iframe>
+                </div>
             </div>
         </div>
     </div>
@@ -1543,12 +1772,7 @@
                     status.className = 'auth-status success show';
                     setTimeout(() => {
                         updateUserProfile();
-                        // Redirect admins to dashboard, students to landing page
-                        if (currentUser.role === 'admin') {
-                            window.location.href = '/admin.html';
-                        } else {
-                            showLandingPage();
-                        }
+                        showLandingPage();
                     }, 1000);
                 } else {
                     status.textContent = data.error || 'Login failed';
@@ -1569,11 +1793,18 @@
             const name = document.getElementById('register-name').value.trim();
             const email = document.getElementById('register-email').value.trim();
             const password = document.getElementById('register-password').value;
+            const course = document.getElementById('register-course').value;
             const btn = document.getElementById('register-btn');
             const status = document.getElementById('register-status');
 
             if (password.length < 6) {
                 status.textContent = 'Password must be at least 6 characters';
+                status.className = 'auth-status error show';
+                return;
+            }
+
+            if (!course) {
+                status.textContent = 'Bitte wählen Sie einen Kurs';
                 status.className = 'auth-status error show';
                 return;
             }
@@ -1586,7 +1817,7 @@
                 const response = await fetch(`${API_URL}/api/auth/register`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, email, password })
+                    body: JSON.stringify({ name, email, password, course, role: 'student' })
                 });
 
                 const data = await response.json();
@@ -1645,7 +1876,25 @@
             document.getElementById('profile-name').value = currentUser.name;
             document.getElementById('profile-picture').value = currentUser.profilePicture || '';
 
-            // Admins get redirected to dashboard automatically in showLandingPage()
+            // Show/hide landing page elements based on role
+            const studentInputContainer = document.getElementById('student-input-container');
+            const adminDashboardContainer = document.getElementById('admin-dashboard-container');
+            const adminDashboardBtn = document.getElementById('admin-dashboard-btn');
+            const projectsToggleBtn = document.getElementById('projects-toggle-btn');
+
+            if (currentUser.role === 'admin') {
+                // Admin: Show dashboard button in center, hide all other buttons
+                if (studentInputContainer) studentInputContainer.style.display = 'none';
+                if (adminDashboardContainer) adminDashboardContainer.style.display = 'block';
+                if (adminDashboardBtn) adminDashboardBtn.style.display = 'none'; // Hide top right button for admins
+                if (projectsToggleBtn) projectsToggleBtn.style.display = 'none';
+            } else {
+                // Student: Show input field, hide dashboard buttons
+                if (studentInputContainer) studentInputContainer.style.display = 'block';
+                if (adminDashboardContainer) adminDashboardContainer.style.display = 'none';
+                if (adminDashboardBtn) adminDashboardBtn.style.display = 'none';
+                if (projectsToggleBtn) projectsToggleBtn.style.display = 'flex';
+            }
         }
 
         // Load projects for landing page sidebar
@@ -1687,13 +1936,21 @@
                 promptLabel.textContent = 'Continue working on this project:';
                 generateBtn.textContent = 'Update Project';
 
+                // Clear preview first
+                previewFrame.src = 'about:blank';
+                previewFrameIPhone.src = 'about:blank';
+
                 // Show code viewer for this project
                 createCodeViewer(project.files, 'code-viewer');
 
                 const indexFile = project.files.find(f => f.path === 'index.html');
                 if (indexFile) {
                     const blob = new Blob([indexFile.content], { type: 'text/html' });
-                    previewFrame.src = URL.createObjectURL(blob);
+                    const blobUrl = URL.createObjectURL(blob);
+                    updatePreviewFrame(blobUrl);
+                } else {
+                    // No files yet
+                    showStatus('Project has no files yet. Waiting for generation...', 'loading');
                 }
 
                 showAppContainer();
@@ -1783,7 +2040,11 @@
         const generateBtn = document.getElementById('generate-btn');
         const statusDiv = document.getElementById('status');
         const previewFrame = document.getElementById('preview-frame');
+        const previewFrameIPhone = document.getElementById('preview-frame-iphone');
+        const previewContainer = document.getElementById('preview-container');
         const promptLabel = document.getElementById('prompt-label');
+
+        let currentViewMode = 'web'; // 'web' or 'iphone'
 
         function showLandingStatus(m, t) {
             landingStatus.textContent = m;
@@ -1867,6 +2128,7 @@
             }
         }
 
+
         function goHome() {
             showLandingPage();
             currentProjectId = null;
@@ -1921,6 +2183,39 @@
             renamingProjectId = null;
         }
 
+        async function deleteProject(projectId, event) {
+            event.stopPropagation();
+
+            if (!confirm('Are you sure you want to delete this project? This action cannot be undone.')) {
+                return;
+            }
+
+            try {
+                const r = await fetchWithAuth(`${API_URL}/api/projects/${projectId}`, {
+                    method: 'DELETE'
+                });
+
+                if (!r.ok) throw new Error('Failed to delete project');
+
+                // If deleted project was current, reset UI
+                if (currentProjectId === projectId) {
+                    currentProjectId = null;
+                    promptInput.value = '';
+                    promptLabel.textContent = 'Describe your app:';
+                    generateBtn.textContent = 'Generate App';
+                    previewFrame.src = 'about:blank';
+                    previewFrameIPhone.src = 'about:blank';
+                    document.getElementById('code-viewer').style.display = 'none';
+                }
+
+                await loadProjects();
+                showStatus('Project deleted successfully', 'success');
+            } catch (e) {
+                console.error('Error deleting project:', e);
+                showStatus('Failed to delete project', 'error');
+            }
+        }
+
         async function loadProjects() {
             try {
                 const r = await fetchWithAuth(`${API_URL}/api/projects`);
@@ -1937,9 +2232,9 @@
                     const div = document.createElement('div');
                     div.className = 'project-item';
                     if (project.id === currentProjectId) div.classList.add('active');
-                    div.innerHTML = `<div class="project-item-header"><h3>${project.name}</h3><div class="project-actions"><button class="rename-btn" onclick="startRename('${project.id}', '${project.name.replace(/'/g, "\\'")}', event)">✎</button></div></div><p>${new Date(project.createdAt).toLocaleDateString()}</p>`;
+                    div.innerHTML = `<div class="project-item-header"><h3>${project.name}</h3><div class="project-actions"><button class="rename-btn" onclick="startRename('${project.id}', '${project.name.replace(/'/g, "\\'")}', event)">✎</button><button class="delete-btn" onclick="deleteProject('${project.id}', event)">🗑️</button></div></div><p>${new Date(project.createdAt).toLocaleDateString()}</p>`;
                     div.onclick = (e) => {
-                        if (!e.target.closest('.rename-btn')) loadProject(project.id);
+                        if (!e.target.closest('.rename-btn') && !e.target.closest('.delete-btn')) loadProject(project.id);
                     };
                     sidebar.appendChild(div);
                 });
@@ -1957,13 +2252,21 @@
                 promptLabel.textContent = 'Continue working on this project:';
                 generateBtn.textContent = 'Update Project';
 
+                // Clear preview first
+                previewFrame.src = 'about:blank';
+                previewFrameIPhone.src = 'about:blank';
+
                 // Show code viewer for this project
                 createCodeViewer(project.files, 'code-viewer');
 
                 const indexFile = project.files.find(f => f.path === 'index.html');
                 if (indexFile) {
                     const blob = new Blob([indexFile.content], { type: 'text/html' });
-                    previewFrame.src = URL.createObjectURL(blob);
+                    const blobUrl = URL.createObjectURL(blob);
+                    updatePreviewFrame(blobUrl);
+                } else {
+                    // No files yet, show empty state
+                    showStatus('Project has no files yet. Waiting for generation...', 'loading');
                 }
                 await loadProjects();
             } catch (e) {
@@ -1978,10 +2281,16 @@
                 showLandingStatus('Please enter a description', 'error');
                 return;
             }
+
+            // Immediately switch to app container and show loading state
             landingButton.disabled = true;
-            showLandingStatus('Creating your app', 'loading');
-            document.getElementById('landing-code-viewer').style.display = 'none';
+            showAppContainer();
+
+            // Show loading in the status
+            showStatus('🎨 Creating your app... This may take a moment', 'loading');
+
             try {
+                // Create project immediately
                 const r = await fetchWithAuth(`${API_URL}/api/generate`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -1989,24 +2298,56 @@
                 });
                 const data = await r.json();
                 if (!r.ok) throw new Error(data.error || 'Failed to generate app');
+
                 currentProjectId = data.project.id;
 
-                // Create code viewer
-                createCodeViewer(data.project.files, 'landing-code-viewer');
-
-                const indexFile = data.project.files.find(f => f.path === 'index.html');
-                if (indexFile) {
-                    const blob = new Blob([indexFile.content], { type: 'text/html' });
-                    previewFrame.src = URL.createObjectURL(blob);
-                }
-                showAppContainer();
+                // Immediately load projects to show the new empty project
                 await loadProjects();
-                showStatus('App created successfully!', 'success');
 
-                // Show code viewer in app container too
-                createCodeViewer(data.project.files, 'code-viewer');
+                // Setup UI for new project
+                promptInput.value = '';
+                promptLabel.textContent = 'Continue working on this project:';
+                generateBtn.textContent = 'Update Project';
+                previewFrame.src = '';
+                document.getElementById('code-viewer').style.display = 'none';
+
+                // Start polling for completion
+                const pollInterval = setInterval(async () => {
+                    try {
+                        const checkR = await fetchWithAuth(`${API_URL}/api/projects/${currentProjectId}`);
+                        const project = await checkR.json();
+
+                        // If files are generated, update UI
+                        if (project.files && project.files.length > 0) {
+                            clearInterval(pollInterval);
+
+                            // Create code viewer
+                            createCodeViewer(project.files, 'code-viewer');
+
+                            const indexFile = project.files.find(f => f.path === 'index.html');
+                            if (indexFile) {
+                                const blob = new Blob([indexFile.content], { type: 'text/html' });
+                                const blobUrl = URL.createObjectURL(blob);
+                                updatePreviewFrame(blobUrl);
+                            }
+
+                            await loadProjects();
+                            showStatus('✨ App created successfully!', 'success');
+                        }
+                    } catch (pollError) {
+                        console.error('Polling error:', pollError);
+                    }
+                }, 2000); // Poll every 2 seconds
+
+                // Stop polling after 5 minutes
+                setTimeout(() => {
+                    clearInterval(pollInterval);
+                }, 300000);
+
+                // Clear the landing prompt for next time
+                landingPrompt.value = '';
             } catch (e) {
-                showLandingStatus(e.message, 'error');
+                showStatus('❌ ' + e.message, 'error');
             } finally {
                 landingButton.disabled = false;
             }
@@ -2042,7 +2383,8 @@
                 const indexFile = data.project.files.find(f => f.path === 'index.html');
                 if (indexFile) {
                     const blob = new Blob([indexFile.content], { type: 'text/html' });
-                    previewFrame.src = URL.createObjectURL(blob);
+                    const blobUrl = URL.createObjectURL(blob);
+                    updatePreviewFrame(blobUrl);
                 }
                 await loadProjects();
             } catch (e) {
@@ -2065,6 +2407,45 @@
                 sidebar.classList.remove('show');
                 overlay.classList.remove('show');
             }
+        }
+
+        // View switching functions
+        function switchToWebView() {
+            currentViewMode = 'web';
+            previewContainer.classList.remove('iphone-view');
+            previewContainer.classList.add('web-view');
+
+            document.getElementById('web-view-btn').classList.add('active');
+            document.getElementById('iphone-view-btn').classList.remove('active');
+
+            // Sync content if needed
+            if (previewFrame.src && !previewFrameIPhone.src) {
+                syncPreviewContent();
+            }
+        }
+
+        function switchToIPhoneView() {
+            currentViewMode = 'iphone';
+            previewContainer.classList.remove('web-view');
+            previewContainer.classList.add('iphone-view');
+
+            document.getElementById('web-view-btn').classList.remove('active');
+            document.getElementById('iphone-view-btn').classList.add('active');
+
+            // Sync content if needed
+            syncPreviewContent();
+        }
+
+        function syncPreviewContent() {
+            // Copy the current preview content to both iframes
+            if (previewFrame.src && previewFrame.src !== 'about:blank') {
+                previewFrameIPhone.src = previewFrame.src;
+            }
+        }
+
+        function updatePreviewFrame(src) {
+            previewFrame.src = src;
+            previewFrameIPhone.src = src;
         }
 
         // Resize functionality

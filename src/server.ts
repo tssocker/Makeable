@@ -29,6 +29,7 @@ interface Project {
   id: string;
   name: string;
   prompt: string;
+  promptHistory?: Array<{ prompt: string; timestamp: string }>; // History of all prompts
   files: Array<{ path: string; content: string }>;
   createdAt: string;
   userId: string;
@@ -55,13 +56,18 @@ try {
 // Auth endpoints
 app.post('/api/auth/register', async (req, res) => {
   try {
-    const { email, password, name, role } = req.body;
+    const { email, password, name, role, course } = req.body;
 
     if (!email || !password || !name) {
       return res.status(400).json({ error: 'Email, password, and name are required' });
     }
 
-    const user = await userStorage.createUser(email, password, name, role || 'student');
+    // Validate course is required for students
+    if (role === 'student' && !course) {
+      return res.status(400).json({ error: 'Course selection is required for students' });
+    }
+
+    const user = await userStorage.createUser(email, password, name, role || 'student', course);
     const token = generateToken(user.id);
 
     res.cookie('token', token, {
@@ -77,7 +83,8 @@ app.post('/api/auth/register', async (req, res) => {
         email: user.email,
         name: user.name,
         profilePicture: user.profilePicture,
-        role: user.role
+        role: user.role,
+        course: user.course
       },
       token
     });
@@ -318,6 +325,39 @@ app.get('/api/projects/:id', authMiddleware, async (req, res) => {
   res.json(project);
 });
 
+// Delete project
+app.delete('/api/projects/:id', authMiddleware, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const authReq = req as AuthRequest;
+    const userId = authReq.userId;
+
+    const project = projects.get(id);
+
+    if (!project) {
+      return res.status(404).json({ error: 'Project not found' });
+    }
+
+    // Security: Only allow deleting own projects (or admin can delete any)
+    const user = users.get(userId!);
+    if (project.userId !== userId && user?.role !== 'admin') {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+
+    // Delete from memory
+    projects.delete(id);
+
+    // Delete from disk
+    const projectPath = path.join(PROJECTS_DIR, `${id}.json`);
+    await fs.unlink(projectPath).catch(err => console.error('Error deleting project file:', err));
+
+    res.json({ success: true, message: 'Project deleted' });
+  } catch (error) {
+    console.error('Error deleting project:', error);
+    res.status(500).json({ error: 'Failed to delete project' });
+  }
+});
+
 // Create new project
 app.post('/api/generate', authMiddleware, async (req, res) => {
   try {
@@ -327,11 +367,7 @@ app.post('/api/generate', authMiddleware, async (req, res) => {
       return res.status(400).json({ error: 'Prompt is required' });
     }
 
-    console.log('Generating app from prompt:', prompt);
-
-    const result = await createApp(prompt);
-
-    // Create or update project
+    // Get user info first
     const authReq = req as AuthRequest;
     const userId = authReq.userId;
 
@@ -339,35 +375,188 @@ app.post('/api/generate', authMiddleware, async (req, res) => {
       return res.status(401).json({ error: 'User not authenticated' });
     }
 
+    // Create project IMMEDIATELY with empty files
     const id = projectId || `project_${Date.now()}`;
-    const name = prompt.slice(0, 50); // First 50 chars as name
 
-    const project: Project = {
+    // Generate a smart project name from the prompt
+    function generateProjectName(prompt: string): string {
+      // Remove common prefixes
+      let cleaned = prompt
+        .replace(/^(ich (möchte|würde|will|hätte) gerne|bau mir|create|build|make|erstelle)\s+/i, '')
+        .replace(/^(eine?|an?)\s+/i, '');
+
+      // Extract key words (nouns, adjectives)
+      const words = cleaned.split(/\s+/).filter(w => w.length > 2);
+
+      // Take first 3-4 meaningful words
+      let name = words.slice(0, 4).join(' ');
+
+      // Capitalize first letter
+      name = name.charAt(0).toUpperCase() + name.slice(1);
+
+      // Limit length
+      if (name.length > 40) {
+        name = name.slice(0, 40).trim() + '...';
+      }
+
+      return name || 'New App';
+    }
+
+    const name = generateProjectName(prompt);
+
+    const placeholderProject: Project = {
       id,
       name,
       prompt,
-      files: result.files,
+      promptHistory: [{ prompt, timestamp: new Date().toISOString() }],
+      files: [],
       createdAt: new Date().toISOString(),
       userId
     };
 
-    projects.set(id, project);
+    projects.set(id, placeholderProject);
 
-    // Save to disk
+    // Save placeholder to disk immediately
     await fs.writeFile(
       path.join(PROJECTS_DIR, `${id}.json`),
-      JSON.stringify(project, null, 2)
+      JSON.stringify(placeholderProject, null, 2)
     );
 
+    // Send immediate response with project ID
     res.json({
       success: true,
       project: {
-        id: project.id,
-        name: project.name,
-        files: project.files
+        id: placeholderProject.id,
+        name: placeholderProject.name,
+        files: []
       },
-      message: 'App generated successfully'
+      message: 'Project created, generating app...'
     });
+
+    // Now generate the app in the background
+    console.log('Generating app from prompt:', prompt);
+
+    try {
+      // Check if API key is valid
+      const apiKey = process.env.ANTHROPIC_API_KEY;
+      let result;
+
+      if (!apiKey || apiKey === 'your_api_key_here' || apiKey.trim().length < 20) {
+        console.log('⚠️  No valid API key found, using mock data');
+        // Use mock data if no API key
+        result = {
+          files: [{
+            path: 'index.html',
+            content: `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${name}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+        }
+        h1 { color: #667eea; margin-bottom: 1rem; font-size: 2rem; }
+        p { color: #666; line-height: 1.6; margin-bottom: 2rem; }
+        .prompt {
+            background: #f5f5f5;
+            padding: 1rem;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            font-style: italic;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-top: 1rem;
+            width: 100%;
+        }
+        button:hover { transform: translateY(-2px); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Demo App</h1>
+        <p>This is a demo app created from your prompt:</p>
+        <div class="prompt">"${prompt}"</div>
+        <p style="margin-top: 2rem;">
+            <strong>Note:</strong> This is mock data. To generate real apps, add a valid Anthropic API key.
+        </p>
+        <button onclick="alert('Button clicked!')">Click Me!</button>
+    </div>
+</body>
+</html>`
+          }]
+        };
+      } else {
+        result = await createApp(prompt);
+      }
+
+      // Update project with generated files
+      const updatedProject: Project = {
+        id,
+        name,
+        prompt,
+        promptHistory: placeholderProject.promptHistory,
+        files: result.files,
+        createdAt: placeholderProject.createdAt,
+        userId
+      };
+
+      projects.set(id, updatedProject);
+
+      // Update on disk
+      await fs.writeFile(
+        path.join(PROJECTS_DIR, `${id}.json`),
+        JSON.stringify(updatedProject, null, 2)
+      );
+
+      console.log('App generation completed for project:', id);
+    } catch (error) {
+      console.error('Error generating app:', error);
+      // If generation fails, create a simple error page
+      const errorProject: Project = {
+        id,
+        name,
+        prompt,
+        files: [{
+          path: 'index.html',
+          content: `<!DOCTYPE html>
+<html><head><title>Error</title><style>body{font-family:sans-serif;padding:2rem;background:#f5f5f5;}</style></head>
+<body><h1>⚠️ Generation Failed</h1><p>Please check your API key and try again.</p></body></html>`
+        }],
+        createdAt: placeholderProject.createdAt,
+        userId
+      };
+      projects.set(id, errorProject);
+      await fs.writeFile(
+        path.join(PROJECTS_DIR, `${id}.json`),
+        JSON.stringify(errorProject, null, 2)
+      );
+    }
   } catch (error) {
     console.error('Error generating app:', error);
     
