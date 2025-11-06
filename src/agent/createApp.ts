@@ -138,7 +138,7 @@ async function processMessageContent(content: any): Promise<any> {
 export async function createApp(
   prompt: string,
   existingFiles?: GeneratedFile[],
-  uploadedFiles?: Array<{ name: string; type: string; data: string }>
+  uploadedFiles?: Array<{ name: string; type: string; data: string; url?: string }>
 ): Promise<AppGenerationResult> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
 
@@ -171,18 +171,45 @@ IMPORTANT INSTRUCTIONS FOR UPDATES:
 - Make minimal, targeted changes - don't rewrite the entire app unless necessary
 
 The user wants to make specific changes to their existing app. Be surgical and precise.`
-    : `You are an expert web developer. Your task is to create a complete, working web application based on the user's description.
+    : `You are an expert web developer creating professional, production-ready web applications.
 
-IMPORTANT INSTRUCTIONS:
+DESIGN GUIDELINES:
+- Create clean, professional, modern designs suitable for business and professional use
+- Use neutral, professional color schemes: whites, grays, subtle blues/greens
+- Avoid playful, toy-like, or overly colorful aesthetics
+- Focus on usability, accessibility, and readability
+- Use professional typography (System fonts like -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto)
+- Base font size should be at least 16px for optimal readability
+- Implement proper spacing and visual hierarchy (use 8px grid system)
+- Add subtle shadows (0 1px 3px rgba(0,0,0,0.1)) and borders (#e5e7eb) for depth
+- Ensure responsive design that works on all screen sizes
+- Use subtle animations only (hover effects with 0.2s transitions)
+
+RECOMMENDED COLOR PALETTE:
+- Primary Action: #2563eb (professional blue) or #059669 (professional green)
+- Background: #ffffff (white), #f9fafb (light gray), #f3f4f6 (gray)
+- Text: #111827 (dark), #6b7280 (medium gray), #9ca3af (light gray)
+- Borders: #e5e7eb (light), #d1d5db (medium)
+- Success: #059669, Warning: #d97706, Error: #dc2626
+- Use accent colors sparingly and only where needed
+
+COMPONENT STYLING:
+- Buttons: solid backgrounds, 6-8px border-radius, padding 0.75rem 1.5rem, clear hover states
+- Inputs: 2px border, 6px radius, proper labels above, focus states with subtle ring
+- Cards: white background, 8px radius, subtle shadow, padding 1.5-2rem
+- Typography: clear hierarchy with h1 (2rem), h2 (1.5rem), body (1rem)
+- Spacing: consistent margins and padding using multiples of 8px (0.5rem, 1rem, 1.5rem, 2rem)
+
+TECHNICAL REQUIREMENTS:
 - Generate a complete, self-contained web application
 - Always create at least an index.html file
 - Include all necessary CSS and JavaScript inline in the HTML for simplicity
-- Make the app visually appealing and functional with modern design
 - Use modern web standards (HTML5, CSS3, ES6+)
-- Use the write_file tool to create each file needed
 - Make sure the app is fully functional and ready to use
+- Use the write_file tool to create each file needed
+- Ensure proper semantic HTML structure
 
-Create a fully functional app that matches the user's request.`;
+Create a fully functional, professional-grade application that looks like it was designed by a professional UX/UI designer.`;
 
   try {
     let userMessage = prompt;
@@ -201,29 +228,65 @@ Create a fully functional app that matches the user's request.`;
 
     // Add uploaded files to the message
     if (uploadedFiles && uploadedFiles.length > 0) {
+      const imageUrls: string[] = [];
+
       for (const file of uploadedFiles) {
         if (file.type.startsWith('image/')) {
-          // Extract base64 data (remove data:image/...;base64, prefix)
-          const base64Data = file.data.split(',')[1];
+          // If URL is provided (from Cloudinary), use it
+          if (file.url) {
+            imageUrls.push(file.url);
+            // Still add base64 image for Vision API to see
+            const base64Data = file.data.split(',')[1];
+            let mediaType: 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp' = 'image/jpeg';
+            if (file.type.includes('png')) mediaType = 'image/png';
+            else if (file.type.includes('gif')) mediaType = 'image/gif';
+            else if (file.type.includes('webp')) mediaType = 'image/webp';
 
-          // Determine media type
-          let mediaType: 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp' = 'image/jpeg';
-          if (file.type.includes('png')) mediaType = 'image/png';
-          else if (file.type.includes('gif')) mediaType = 'image/gif';
-          else if (file.type.includes('webp')) mediaType = 'image/webp';
+            messageContent.push({
+              type: 'image',
+              source: {
+                type: 'base64',
+                media_type: mediaType,
+                data: base64Data
+              }
+            });
+          } else {
+            // Fallback to base64 if no URL (old behavior)
+            const base64Data = file.data.split(',')[1];
+            let mediaType: 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp' = 'image/jpeg';
+            if (file.type.includes('png')) mediaType = 'image/png';
+            else if (file.type.includes('gif')) mediaType = 'image/gif';
+            else if (file.type.includes('webp')) mediaType = 'image/webp';
 
-          messageContent.push({
-            type: 'image',
-            source: {
-              type: 'base64',
-              media_type: mediaType,
-              data: base64Data
-            }
-          });
+            messageContent.push({
+              type: 'image',
+              source: {
+                type: 'base64',
+                media_type: mediaType,
+                data: base64Data
+              }
+            });
+          }
         } else {
           // For non-image files, include them as text context
           messageContent[0].text += `\n\n[User provided file: ${file.name}]`;
         }
+      }
+
+      // Add instruction about images with URLs
+      if (imageUrls.length > 0) {
+        messageContent[0].text += `\n\n🚨 CRITICAL - ${imageUrls.length} IMAGE(S) PROVIDED 🚨
+
+You can see ${imageUrls.length} image(s) above in the message content.
+
+YOU MUST embed these images directly in your HTML using these exact URLs:
+
+${imageUrls.map((url, i) => `Image ${i + 1}: ${url}`).join('\n')}
+
+Use <img> tags like this:
+<img src="${imageUrls[0]}" alt="User provided image" style="max-width: 100%; height: auto;">
+
+DO NOT use base64 data URIs - use the URLs provided above!`;
       }
     }
 
@@ -241,7 +304,7 @@ Create a fully functional app that matches the user's request.`;
     for (let i = 0; i < 10; i++) {
       const response = await client.messages.create({
         model: 'claude-sonnet-4-20250514',
-        max_tokens: 8192,
+        max_tokens: 16000,
         system: systemPrompt,
         tools,
         messages
