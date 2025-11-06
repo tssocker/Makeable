@@ -431,7 +431,7 @@ app.post('/api/upload-image', authMiddleware, upload.single('image'), async (req
           folder: 'makeable-uploads',
           resource_type: 'auto'
         },
-        (error, result) => {
+        (error: any, result: any) => {
           if (error) reject(error);
           else resolve(result);
         }
