@@ -524,10 +524,16 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
+        .landing-textarea-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
         .landing-textarea {
             width: 100%;
             min-height: 120px;
             padding: 1.25rem;
+            padding-right: 3.5rem;
             border: 2px solid #e0e0e0;
             border-radius: 12px;
             font-size: 1.1rem;
@@ -543,6 +549,39 @@
             box-shadow: 0 0 0 3px rgba(255, 107, 157, 0.1);
         }
 
+        .voice-input-btn {
+            position: absolute;
+            right: 1rem;
+            bottom: 1rem;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--makeable-pink) 0%, var(--makeable-orange) 100%);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(255, 107, 157, 0.3);
+        }
+
+        .voice-input-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(255, 107, 157, 0.5);
+        }
+
+        .voice-input-btn.recording {
+            animation: pulse 1.5s infinite;
+            background: #dc3545;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7); }
+            50% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(220, 53, 69, 0); }
+        }
+
         .file-upload-section {
             margin-top: 1rem;
             padding: 1rem;
@@ -550,11 +589,24 @@
             border-radius: 10px;
             border: 2px dashed #e0e0e0;
             transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
         }
 
         .file-upload-section:hover {
             border-color: var(--makeable-pink);
             background: #fff;
+        }
+
+        .file-upload-section.drag-over {
+            border-color: var(--makeable-orange);
+            background: #fff5f0;
+            transform: scale(1.02);
+        }
+
+        .file-upload-section::before {
+            content: '';
+            display: none;
         }
 
         .file-upload-label {
@@ -852,11 +904,132 @@
             cursor: pointer;
             transition: all 0.3s;
             box-shadow: 0 2px 8px rgba(255, 107, 157, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
         }
 
         .new-project-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(255, 107, 157, 0.5);
+        }
+
+        /* Tab System */
+        .project-tabs {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            padding: 0.5rem;
+        }
+
+        .project-tab {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.875rem 1rem;
+            background: transparent;
+            border: none;
+            border-left: 3px solid transparent;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+            position: relative;
+        }
+
+        .project-tab:hover {
+            background: rgba(255, 107, 157, 0.08);
+        }
+
+        .project-tab.active {
+            background: rgba(255, 107, 157, 0.15);
+            border-left-color: var(--makeable-pink);
+        }
+
+        .project-tab-icon {
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .project-tab-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .project-tab-name {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #333;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 0.25rem;
+        }
+
+        .project-tab.active .project-tab-name {
+            color: var(--makeable-pink);
+        }
+
+        .project-tab-date {
+            font-size: 0.75rem;
+            color: #999;
+        }
+
+        .project-tab-actions {
+            display: flex;
+            gap: 0.25rem;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+            margin-left: auto;
+        }
+
+        .project-tab:hover .project-tab-actions {
+            opacity: 1;
+        }
+
+        .project-tab-action-btn {
+            padding: 0.375rem 0.5rem;
+            background: transparent;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+            color: #6b7280;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+        }
+
+        .project-tab-action-btn:hover {
+            background: rgba(0, 0, 0, 0.05);
+            transform: scale(1.05);
+        }
+
+        .project-tab-action-btn:active {
+            transform: scale(0.95);
+        }
+
+        .project-tab.active .project-tab-action-btn {
+            color: #9ca3af;
+        }
+
+        .project-tab.active .project-tab-action-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .project-tab-close:hover {
+            color: #dc3545;
+            background: rgba(220, 53, 69, 0.1);
+        }
+
+        .project-tab.active .project-tab-close:hover {
+            color: #dc3545;
+            background: rgba(255, 255, 255, 0.2);
         }
 
         .sidebar-footer {
@@ -1177,10 +1350,16 @@
             font-size: 1rem;
         }
 
+        .textarea-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
         textarea {
             width: 100%;
             min-height: 160px;
             padding: 1rem;
+            padding-right: 3.5rem;
             border: 2px solid #e0e0e0;
             border-radius: 10px;
             font-size: 1rem;
@@ -1193,6 +1372,12 @@
             outline: none;
             border-color: var(--makeable-pink);
             box-shadow: 0 0 0 3px rgba(255, 107, 157, 0.1);
+        }
+
+        .textarea-wrapper .voice-input-btn {
+            position: absolute;
+            right: 0.75rem;
+            bottom: 0.75rem;
         }
 
         button:not(.auth-button):not(.auth-tab):not(.modal-button):not(.modal-close) {
@@ -1574,6 +1759,176 @@
             padding: 2rem;
             text-align: center;
         }
+
+        /* AI Assistant Suggestions */
+        .ai-suggestions-container {
+            margin-top: 1rem;
+            padding: 1.25rem;
+            background: linear-gradient(135deg, rgba(139, 127, 255, 0.05) 0%, rgba(255, 107, 157, 0.05) 100%);
+            border: 2px solid rgba(139, 127, 255, 0.2);
+            border-radius: 12px;
+            display: none;
+            animation: slideIn 0.4s ease;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .ai-suggestions-container.show {
+            display: block;
+        }
+
+        /* Custom scrollbar for AI suggestions */
+        .ai-suggestions-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .ai-suggestions-container::-webkit-scrollbar-track {
+            background: rgba(139, 127, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        .ai-suggestions-container::-webkit-scrollbar-thumb {
+            background: var(--makeable-purple);
+            border-radius: 4px;
+        }
+
+        .ai-suggestions-container::-webkit-scrollbar-thumb:hover {
+            background: var(--makeable-pink);
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .ai-assistant-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .ai-assistant-avatar {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--makeable-purple) 0%, var(--makeable-pink) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .ai-assistant-title {
+            font-weight: 600;
+            color: var(--makeable-purple);
+            font-size: 1rem;
+        }
+
+        .ai-assistant-subtitle {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .ai-suggestion-message {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            line-height: 1.8;
+            color: #333;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        /* Markdown-style formatting for AI suggestions */
+        .ai-suggestion-message h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--makeable-purple);
+            margin: 1.5rem 0 0.75rem 0;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .ai-suggestion-message h2:first-child {
+            margin-top: 0;
+        }
+
+        .ai-suggestion-message strong {
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        .ai-suggestion-message ul {
+            list-style: none;
+            padding-left: 0;
+            margin: 0.5rem 0;
+        }
+
+        .ai-suggestion-message li {
+            padding-left: 1.5rem;
+            margin: 0.35rem 0;
+            position: relative;
+        }
+
+        .ai-suggestion-message li:before {
+            content: '•';
+            position: absolute;
+            left: 0.5rem;
+            color: var(--makeable-pink);
+            font-weight: bold;
+        }
+
+        .ai-suggestion-message p {
+            margin: 0.75rem 0;
+        }
+
+        .ai-suggestion-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+
+        .ai-suggestion-chip {
+            padding: 0.5rem 1rem;
+            background: white;
+            border: 2px solid var(--makeable-purple);
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: var(--makeable-purple);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .ai-suggestion-chip:hover {
+            background: var(--makeable-purple);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(139, 127, 255, 0.3);
+        }
+
+        .ai-suggestions-loading {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .ai-suggestions-loading .dots::after {
+            content: '•';
+            animation: dotPulse 1.5s infinite;
+        }
+
+        @keyframes dotPulse {
+            0%, 20% { content: '•'; }
+            40% { content: '••'; }
+            60%, 100% { content: '•••'; }
+        }
     </style>
 </head>
 <body>
@@ -1689,14 +2044,15 @@
                 </div>
                 <!-- Student Input Container -->
                 <div class="landing-input-container" id="student-input-container" style="display: none;">
-                    <textarea id="landing-prompt" class="landing-textarea" placeholder="Just make it happen"></textarea>
-                    <!-- File upload temporarily disabled
+                    <div class="landing-textarea-wrapper">
+                        <textarea id="landing-prompt" class="landing-textarea" placeholder="Just make it happen"></textarea>
+                        <button class="voice-input-btn" id="landing-voice-btn" title="Voice Input">🎤</button>
+                    </div>
                     <div class="file-upload-section">
                         <label class="file-upload-label">📎 Add files or images (optional)</label>
-                        <input type="file" id="landing-file-input" class="file-input" multiple>
+                        <input type="file" id="landing-file-input" class="file-input" multiple accept="image/*,.pdf,.txt,.doc,.docx">
                         <div id="landing-file-preview" class="file-preview-container"></div>
                     </div>
-                    -->
                     <button id="landing-button" class="landing-button">Create App</button>
                     <div id="landing-status" class="status hidden"></div>
                     <div id="landing-code-viewer" style="display: none;"></div>
@@ -1744,16 +2100,30 @@
             <div class="resize-handle" id="resize-handle-1"></div>
             <div class="input-section" id="app-input-section">
                 <label for="prompt" id="prompt-label">Describe your app:</label>
-                <textarea id="prompt" placeholder="Example: Create a simple todo list app"></textarea>
-                <!-- File upload temporarily disabled
+                <div class="textarea-wrapper">
+                    <textarea id="prompt" placeholder="Example: Create a simple todo list app"></textarea>
+                    <button class="voice-input-btn" id="app-voice-btn" title="Voice Input">🎤</button>
+                </div>
                 <div class="file-upload-section">
                     <label class="file-upload-label">📎 Add files or images (optional)</label>
-                    <input type="file" id="app-file-input" class="file-input" multiple>
+                    <input type="file" id="app-file-input" class="file-input" multiple accept="image/*,.pdf,.txt,.doc,.docx">
                     <div id="app-file-preview" class="file-preview-container"></div>
                 </div>
-                -->
                 <button id="generate-btn">Generate App</button>
                 <div id="status" class="status hidden"></div>
+
+                <!-- AI Suggestions Container -->
+                <div id="ai-suggestions" class="ai-suggestions-container">
+                    <div class="ai-assistant-header">
+                        <div class="ai-assistant-avatar">🤖</div>
+                        <div>
+                            <div class="ai-assistant-title">AI Assistant</div>
+                            <div class="ai-assistant-subtitle">Vorschläge für deine App</div>
+                        </div>
+                    </div>
+                    <div id="ai-suggestion-content"></div>
+                </div>
+
                 <div id="code-viewer" style="display: none;"></div>
             </div>
             <div class="resize-handle" id="resize-handle-2"></div>
@@ -1868,7 +2238,52 @@
                     const data = await response.json();
                     currentUser = data; // API returns user object directly
                     updateUserProfile();
-                    showLandingPage();
+
+                    // Check if there's a last opened project in localStorage
+                    const lastProjectId = localStorage.getItem('lastOpenedProject');
+                    if (lastProjectId) {
+                        // Try to load the last opened project
+                        try {
+                            const projectResponse = await fetchWithAuth(`${API_URL}/api/projects/${lastProjectId}`);
+                            if (projectResponse.ok) {
+                                const project = await projectResponse.json();
+                                // Load the project directly into the app container
+                                currentProjectId = project.id;
+                                promptInput.value = '';
+                                promptLabel.textContent = 'Continue working on this project:';
+                                generateBtn.textContent = 'Update Project';
+
+                                showAppContainer();
+
+                                // Show code viewer for this project
+                                createCodeViewer(project.files, 'code-viewer');
+
+                                const indexFile = project.files.find(f => f.path === 'index.html');
+                                if (indexFile) {
+                                    const blob = new Blob([indexFile.content], { type: 'text/html' });
+                                    const blobUrl = URL.createObjectURL(blob);
+                                    updatePreviewFrame(blobUrl);
+                                }
+
+                                await loadProjects();
+
+                                // Generate project-specific AI suggestions
+                                if (project.prompt && project.files && project.files.length > 0) {
+                                    generateAISuggestions(project.prompt, project);
+                                }
+
+                                return true;
+                            }
+                        } catch (projectError) {
+                            console.error('Failed to load last project:', projectError);
+                            // If loading the last project fails, just show landing page
+                            showLandingPage();
+                        }
+                    } else {
+                        // No last project, show landing page
+                        showLandingPage();
+                    }
+
                     return true;
                 } else {
                     clearToken();
@@ -2104,6 +2519,9 @@
                 promptLabel.textContent = 'Continue working on this project:';
                 generateBtn.textContent = 'Update Project';
 
+                // Save last opened project to localStorage
+                localStorage.setItem('lastOpenedProject', project.id);
+
                 // Clear preview first
                 previewFrame.src = 'about:blank';
                 previewFrameIPhone.src = 'about:blank';
@@ -2123,6 +2541,11 @@
 
                 showAppContainer();
                 await loadProjects();
+
+                // Generate project-specific AI suggestions when loading from landing
+                if (project.prompt && project.files && project.files.length > 0) {
+                    generateAISuggestions(project.prompt, project);
+                }
             } catch (e) {
                 console.error('Error loading project:', e);
             }
@@ -2305,13 +2728,56 @@
             previewFrame.src = '';
         }
 
-        function newProject() {
-            currentProjectId = null;
+        async function newProject() {
+            // Create a temporary placeholder tab immediately
+            const tempId = 'temp_' + Date.now();
+            currentProjectId = tempId;
+
             promptInput.value = '';
             promptLabel.textContent = 'Describe your app:';
             generateBtn.textContent = 'Generate App';
-            previewFrame.src = '';
-            document.querySelectorAll('.project-item').forEach(el => el.classList.remove('active'));
+            previewFrame.src = 'about:blank';
+            previewFrameIPhone.src = 'about:blank';
+            document.getElementById('code-viewer').style.display = 'none';
+
+            // Clear active state from all tabs
+            document.querySelectorAll('.project-tab').forEach(el => el.classList.remove('active'));
+
+            // Create and add new temporary tab
+            const tabsContainer = document.getElementById('project-tabs');
+            if (tabsContainer) {
+                const newTab = document.createElement('div');
+                newTab.className = 'project-tab active';
+                newTab.id = `tab-${tempId}`;
+                newTab.innerHTML = `
+                    <div class="project-tab-icon">✨</div>
+                    <div class="project-tab-content">
+                        <div class="project-tab-name">New Project</div>
+                        <div class="project-tab-date">Just now</div>
+                    </div>
+                    <div class="project-tab-actions">
+                        <button class="project-tab-close" onclick="cancelNewProject('${tempId}', event)">×</button>
+                    </div>
+                `;
+
+                // Insert at the beginning
+                tabsContainer.insertBefore(newTab, tabsContainer.firstChild);
+            }
+
+            // Focus on prompt input
+            promptInput.focus();
+
+            showStatus('✨ New project started - describe your app to begin', 'info');
+        }
+
+        function cancelNewProject(tempId, event) {
+            event.stopPropagation();
+            const tab = document.getElementById(`tab-${tempId}`);
+            if (tab) {
+                tab.remove();
+            }
+            currentProjectId = null;
+            showStatus('Project cancelled', 'hidden');
         }
 
         function startRename(projectId, currentName, event) {
@@ -2384,31 +2850,96 @@
             }
         }
 
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+
+            if (diffMins < 1) return 'Just now';
+            if (diffMins < 60) return `${diffMins}m ago`;
+            if (diffHours < 24) return `${diffHours}h ago`;
+            if (diffDays < 7) return `${diffDays}d ago`;
+            return date.toLocaleDateString();
+        }
+
         async function loadProjects() {
             try {
                 const r = await fetchWithAuth(`${API_URL}/api/projects`);
                 const data = await r.json();
                 const sidebar = document.getElementById('projects-sidebar');
                 const header = sidebar.querySelector('.sidebar-header');
+
+                // Clear sidebar but keep header
                 sidebar.innerHTML = '';
                 sidebar.appendChild(header);
+
+                // Create tabs container
+                const tabsContainer = document.createElement('div');
+                tabsContainer.className = 'project-tabs';
+                tabsContainer.id = 'project-tabs';
+
                 if (data.projects.length === 0) {
-                    sidebar.innerHTML += '<div class="empty-state">No projects yet<br>Click "New Project" to start!</div>';
+                    tabsContainer.innerHTML = '<div class="empty-state">No projects yet<br>Click "+ New Project" to start!</div>';
+                    sidebar.appendChild(tabsContainer);
                     return;
                 }
-                data.projects.reverse().forEach(project => {
-                    const div = document.createElement('div');
-                    div.className = 'project-item';
-                    if (project.id === currentProjectId) div.classList.add('active');
-                    div.innerHTML = `<div class="project-item-header"><h3>${project.name}</h3><div class="project-actions"><button class="rename-btn" onclick="startRename('${project.id}', '${project.name.replace(/'/g, "\\'")}', event)">✎</button><button class="delete-btn" onclick="deleteProject('${project.id}', event)">🗑️</button></div></div><p>${new Date(project.createdAt).toLocaleDateString()}</p>`;
-                    div.onclick = (e) => {
-                        if (!e.target.closest('.rename-btn') && !e.target.closest('.delete-btn')) loadProject(project.id);
+
+                // Sort by creation date (newest first)
+                data.projects.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+                data.projects.forEach(project => {
+                    const tab = document.createElement('div');
+                    tab.className = 'project-tab';
+                    if (project.id === currentProjectId) tab.classList.add('active');
+
+                    tab.innerHTML = `
+                        <div class="project-tab-icon">📱</div>
+                        <div class="project-tab-content">
+                            <div class="project-tab-name" title="${project.name}">${project.name}</div>
+                            <div class="project-tab-date">${formatDate(project.createdAt)}</div>
+                        </div>
+                        <div class="project-tab-actions">
+                            <button class="project-tab-action-btn" onclick="startRenameTab('${project.id}', '${project.name.replace(/'/g, "\\'")}', event)" title="Rename">✎</button>
+                            <button class="project-tab-action-btn project-tab-close" onclick="deleteProject('${project.id}', event)" title="Delete">×</button>
+                        </div>
+                    `;
+
+                    tab.onclick = (e) => {
+                        if (!e.target.closest('.project-tab-actions')) {
+                            loadProject(project.id);
+                        }
                     };
-                    sidebar.appendChild(div);
+
+                    tabsContainer.appendChild(tab);
                 });
+
+                sidebar.appendChild(tabsContainer);
             } catch (e) {
                 console.error('Error loading projects:', e);
             }
+        }
+
+        function startRenameTab(projectId, currentName, event) {
+            event.stopPropagation();
+            renamingProjectId = projectId;
+            const tab = event.target.closest('.project-tab');
+            const nameEl = tab.querySelector('.project-tab-name');
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'rename-input';
+            input.style.cssText = 'width: 100%; padding: 0.25rem; border: 2px solid var(--makeable-pink); border-radius: 4px; font-size: 0.9rem;';
+            input.value = currentName;
+            input.onkeydown = async (e) => {
+                if (e.key === 'Enter') await saveRename(projectId, input.value);
+                else if (e.key === 'Escape') await loadProjects();
+            };
+            input.onblur = async () => await saveRename(projectId, input.value);
+            nameEl.replaceWith(input);
+            input.focus();
+            input.select();
         }
 
         async function loadProject(projectId) {
@@ -2419,6 +2950,9 @@
                 promptInput.value = '';
                 promptLabel.textContent = 'Continue working on this project:';
                 generateBtn.textContent = 'Update Project';
+
+                // Save last opened project to localStorage
+                localStorage.setItem('lastOpenedProject', project.id);
 
                 // Clear preview first
                 previewFrame.src = 'about:blank';
@@ -2437,6 +2971,11 @@
                     showStatus('Project has no files yet. Waiting for generation...', 'loading');
                 }
                 await loadProjects();
+
+                // Generate project-specific AI suggestions when switching projects
+                if (project.prompt && project.files && project.files.length > 0) {
+                    generateAISuggestions(project.prompt, project);
+                }
             } catch (e) {
                 console.error('Error loading project:', e);
                 showStatus('Failed to load project', 'error');
@@ -2552,8 +3091,18 @@
                 const data = await r.json();
                 if (!r.ok) throw new Error(data.error || 'Failed to generate app');
                 showStatus('App generated successfully!', 'success');
+
+                // Remove temporary tab if exists
+                if (currentProjectId && currentProjectId.startsWith('temp_')) {
+                    const tempTab = document.getElementById(`tab-${currentProjectId}`);
+                    if (tempTab) tempTab.remove();
+                }
+
                 currentProjectId = data.project.id;
                 promptInput.value = '';
+
+                // Save last opened project to localStorage
+                localStorage.setItem('lastOpenedProject', data.project.id);
 
                 // Clear files after successful generation
                 appFiles = [];
@@ -2571,12 +3120,341 @@
                     updatePreviewFrame(blobUrl);
                 }
                 await loadProjects();
+
+                // Generate AI suggestions after successful app creation
+                generateAISuggestions(prompt, data.project);
+
             } catch (e) {
                 showStatus(e.message, 'error');
             } finally {
                 generateBtn.disabled = false;
             }
         });
+
+        // AI Suggestions Feature
+        // Simple Markdown to HTML converter for AI suggestions
+        function markdownToHTML(markdown) {
+            let html = markdown;
+
+            // Convert ## headings
+            html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+
+            // Convert **bold**
+            html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+
+            // Convert lists (lines starting with -)
+            html = html.replace(/^- (.+)$/gm, '<li>$1</li>');
+
+            // Wrap consecutive <li> items in <ul>
+            html = html.replace(/(<li>.*<\/li>\n?)+/g, match => {
+                return '<ul>' + match + '</ul>';
+            });
+
+            // Convert line breaks to paragraphs
+            const parts = html.split('\n\n');
+            html = parts.map(part => {
+                part = part.trim();
+                if (!part) return '';
+                if (part.startsWith('<h2>') || part.startsWith('<ul>')) {
+                    return part;
+                }
+                return '<p>' + part + '</p>';
+            }).join('\n');
+
+            return html;
+        }
+
+        async function generateAISuggestions(originalPrompt, project) {
+            const suggestionsContainer = document.getElementById('ai-suggestions');
+            const suggestionsContent = document.getElementById('ai-suggestion-content');
+
+            // Show loading state
+            suggestionsContainer.classList.add('show');
+            suggestionsContent.innerHTML = `
+                <div class="ai-suggestions-loading">
+                    <span>Ich analysiere deine App und erstelle Vorschläge</span>
+                    <span class="dots"></span>
+                </div>
+            `;
+
+            try {
+                // Analyze the app and generate suggestions
+                const suggestions = await analyzeAppAndSuggest(originalPrompt, project);
+
+                // Convert markdown to HTML
+                const formattedMessage = markdownToHTML(suggestions.message);
+
+                // Display suggestions
+                suggestionsContent.innerHTML = `
+                    <div class="ai-suggestion-message">
+                        ${formattedMessage}
+                    </div>
+                    <div class="ai-suggestion-chips">
+                        ${suggestions.chips.map(chip => `
+                            <button class="ai-suggestion-chip" onclick="applySuggestion('${chip.replace(/'/g, "\\'")}')">
+                                ${chip}
+                            </button>
+                        `).join('')}
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error generating suggestions:', error);
+                suggestionsContainer.classList.remove('show');
+            }
+        }
+
+        async function analyzeAppAndSuggest(prompt, project) {
+            try {
+                // Use Claude AI to generate contextual suggestions
+                const response = await fetchWithAuth(`${API_URL}/api/ai-suggestions`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        prompt: prompt,
+                        projectFiles: project?.files || []
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to generate AI suggestions');
+                }
+
+                const data = await response.json();
+                return data.suggestions;
+            } catch (error) {
+                console.error('Error fetching AI suggestions:', error);
+                // Fallback to simple context-based suggestions
+                return generateFallbackSuggestions(prompt);
+            }
+        }
+
+        function generateFallbackSuggestions(prompt) {
+            const suggestions = {
+                message: '',
+                chips: []
+            };
+
+            const promptLower = prompt.toLowerCase();
+
+            // Analyze app type and provide relevant suggestions
+            if (promptLower.includes('todo') || promptLower.includes('task') || promptLower.includes('aufgaben')) {
+                suggestions.message = `
+Ich habe deine Todo-App analysiert und einige Verbesserungsvorschläge gefunden:
+
+## 📋 Funktionale Erweiterungen
+
+**Kategorisierung & Organisation:**
+- Füge Kategorien hinzu, um Tasks thematisch zu gruppieren
+- Implementiere Prioritätsstufen (Hoch, Mittel, Niedrig)
+- Ermögliche das Hinzufügen von Fälligkeitsdaten und Erinnerungen
+
+**Benutzerfreundlichkeit:**
+- Dark Mode für bessere Nutzererfahrung bei Nacht
+- Suchfunktion für schnelles Auffinden von Tasks
+- Drag & Drop zum Sortieren von Aufgaben
+
+## 🎨 Design-Verbesserungen
+- Füge visuelle Indikatoren für überfällige Tasks hinzu
+- Verwende Farben zur Unterscheidung von Prioritäten
+- Animationen beim Abhaken von Tasks
+
+Welche dieser Funktionen möchtest du als Erstes umsetzen?`;
+                suggestions.chips = [
+                    'Kategorien & Prioritäten hinzufügen',
+                    'Dark Mode implementieren',
+                    'Suchfunktion einbauen',
+                    'Drag & Drop ermöglichen'
+                ];
+            } else if (promptLower.includes('calculator') || promptLower.includes('rechner') || promptLower.includes('calculate')) {
+                suggestions.message = `
+Dein Rechner funktioniert gut! Hier sind professionelle Erweiterungsmöglichkeiten:
+
+## 🔢 Funktionale Features
+
+**Erweiterte Berechnungen:**
+- Verlauf der letzten Berechnungen anzeigen
+- Wissenschaftlicher Modus (sin, cos, tan, log, etc.)
+- Prozentrechnung und Wurzelfunktionen
+
+**Usability:**
+- Tastatur-Shortcuts für schnellere Bedienung
+- Copy & Paste Funktionalität
+- Responsive Design für mobile Geräte
+
+## 🎨 Design & UX
+- Verschiedene Themes (Light, Dark, High Contrast)
+- Animationen für Tastendruck
+- Größeres Display für bessere Lesbarkeit
+
+Welchen Bereich möchtest du ausbauen?`;
+                suggestions.chips = [
+                    'Verlauf hinzufügen',
+                    'Wissenschaftlicher Modus',
+                    'Tastatur-Shortcuts',
+                    'Theme-Wechsel'
+                ];
+            } else if (promptLower.includes('form') || promptLower.includes('formular') || promptLower.includes('contact')) {
+                suggestions.message = `
+Ich habe dein Formular überprüft. Hier sind wichtige Verbesserungen für ein professionelles Kontaktformular:
+
+## ✅ Validierung & Sicherheit
+
+**Input-Validierung:**
+- Email-Format-Prüfung in Echtzeit
+- Pflichtfeld-Markierung mit visuellen Indikatoren
+- Zeichen-Limits für Textfelder
+
+**Datenschutz:**
+- DSGVO-konformer Datenschutz-Hinweis
+- Checkbox für Einwilligung zur Datenverarbeitung
+- SSL-Verschlüsselung Hinweis
+
+## 💬 User Feedback
+- Erfolgsbestätigung nach dem Absenden
+- Detaillierte Fehlermeldungen bei ungültigen Eingaben
+- Loading-State während der Übertragung
+
+## 🎨 UX-Optimierungen
+- Auto-Focus auf erstes Feld
+- Tab-Navigation zwischen Feldern
+- Mobile-optimierte Tastatur-Typen
+
+Was möchtest du zuerst verbessern?`;
+                suggestions.chips = [
+                    'Email-Validierung einbauen',
+                    'Datenschutz-Hinweis hinzufügen',
+                    'Erfolgsbestätigung zeigen',
+                    'Fehlerbehandlung verbessern'
+                ];
+            } else if (promptLower.includes('dashboard') || promptLower.includes('analytics')) {
+                suggestions.message = `
+Dein Dashboard sieht professionell aus! Hier sind Enterprise-Level Features, die es noch leistungsfähiger machen:
+
+## 📊 Daten & Analytics
+
+**Erweiterte Visualisierungen:**
+- Interaktive Charts mit Zoom und Filter-Funktionen
+- Vergleichsansicht für verschiedene Zeiträume
+- Export-Funktion (PDF, CSV, Excel)
+
+**Real-time Features:**
+- Live-Daten-Updates ohne Seiten-Reload
+- WebSocket-Verbindung für Echtzeit-Metriken
+- Push-Benachrichtigungen bei wichtigen Ereignissen
+
+## 🔧 Funktionalität
+- Anpassbare Widgets per Drag & Drop
+- Verschiedene Zeitfilter (Tag, Woche, Monat, Jahr, Custom)
+- Personalisierte Dashboards pro Nutzer
+
+## 🎨 UX & Performance
+- Responsive Design für alle Bildschirmgrößen
+- Lazy Loading für schnellere Ladezeiten
+- Dark Mode Option
+
+Welches Feature würde den größten Mehrwert bieten?`;
+                suggestions.chips = [
+                    'Live-Daten implementieren',
+                    'Export-Funktion (PDF/CSV)',
+                    'Zeitfilter hinzufügen',
+                    'Benachrichtigungen einrichten'
+                ];
+            } else if (promptLower.includes('shop') || promptLower.includes('ecommerce') || promptLower.includes('store')) {
+                suggestions.message = `
+Großartiger Start für deinen Online-Shop! Hier sind essenzielle E-Commerce Features:
+
+## 🛒 Shopping Experience
+
+**Warenkorb-Funktionalität:**
+- Produktanzahl anpassen
+- Warenkorb persistent speichern (LocalStorage)
+- Artikelanzahl im Header-Icon anzeigen
+
+**Produkt-Features:**
+- Erweiterte Filter (Preis, Kategorie, Farbe, Größe)
+- Produktsuche mit Auto-Suggest
+- Kundenbewertungen & Sternebewertung
+
+## 💳 Checkout & Zahlung
+- Multi-Step Checkout-Prozess
+- Verschiedene Zahlungsoptionen (Kreditkarte, PayPal, etc.)
+- Versandkosten-Berechnung
+- Bestellbestätigung per Email
+
+## 🎯 Conversion-Optimierung
+- "Ähnliche Produkte" Empfehlungen
+- Wunschliste Funktion
+- Newsletter-Anmeldung
+- Rabattcodes & Gutscheine
+
+Welcher Bereich hat Priorität?`;
+                suggestions.chips = [
+                    'Warenkorb implementieren',
+                    'Produktfilter hinzufügen',
+                    'Bewertungssystem einbauen',
+                    'Checkout-Prozess erstellen'
+                ];
+            } else {
+                // Generic suggestions for any app
+                suggestions.message = `
+Ich habe deine App analysiert. Hier sind professionelle Verbesserungsvorschläge:
+
+## 🎯 Benutzerfreundlichkeit
+
+**Responsive Design:**
+- Mobile-First Optimierung für alle Bildschirmgrößen
+- Touch-Gesten für mobile Geräte
+- Optimierte Navigation für Tablets
+
+**Performance:**
+- Ladeanimationen während Datenabfrage
+- Lazy Loading für Bilder und schwere Komponenten
+- Caching-Strategien für schnellere Wiederholungsbesuche
+
+## 🛡️ Fehlerbehandlung & Feedback
+
+**User Feedback:**
+- Toast-Notifications für Erfolg und Fehler
+- Inline-Validierung bei Formularen
+- Loading States für alle Actions
+
+**Error Handling:**
+- Nutzerfreundliche Fehlermeldungen
+- Fallback UI für fehlende Daten
+- 404-Seite mit Navigation zurück
+
+## 🎨 Design & Accessibility
+- Dark Mode Option
+- Keyboard Navigation Support
+- ARIA Labels für Screen Reader
+- Konsistente Farbpalette und Typography
+
+## ⚡ Technische Optimierung
+- SEO-Optimierung (Meta Tags, Sitemap)
+- Progressive Web App (PWA) Features
+- Analytics Integration
+- Cookie-Consent Banner
+
+Welchen Aspekt möchtest du verbessern?`;
+                suggestions.chips = [
+                    'Responsive Design optimieren',
+                    'Ladeanimationen hinzufügen',
+                    'Fehlerbehandlung verbessern',
+                    'Performance steigern'
+                ];
+            }
+
+            return suggestions;
+        }
+
+        function applySuggestion(suggestion) {
+            // Fill the prompt input with the suggestion
+            promptInput.value = `${suggestion} zur App hinzufügen`;
+            promptInput.focus();
+
+            // Scroll to input
+            promptInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
 
         // Navigate to Projects from Landing Page
         function goToProjects() {
@@ -2770,27 +3648,187 @@
             return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
         }
 
+        // Upload image to Cloudinary and get URL
+        async function uploadImageToCloudinary(file) {
+            try {
+                const formData = new FormData();
+                formData.append('image', file);
+
+                const response = await fetchWithAuth(`${API_URL}/api/upload-image`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to upload image');
+                }
+
+                const data = await response.json();
+                return data.url;
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                return null;
+            }
+        }
+
         async function convertFilesToBase64(files) {
-            const promises = files.map(file => {
-                return new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onload = () => {
-                        resolve({
-                            name: file.name,
-                            type: file.type,
-                            data: reader.result
-                        });
-                    };
-                    reader.onerror = reject;
-                    reader.readAsDataURL(file);
+            const promises = files.map(async (file) => {
+                return new Promise(async (resolve, reject) => {
+                    // Compress images before converting to base64
+                    if (file.type.startsWith('image/')) {
+                        // First, upload to Cloudinary to get URL
+                        const cloudinaryUrl = await uploadImageToCloudinary(file);
+
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            const img = new Image();
+                            img.onload = () => {
+                                // Create canvas to resize/compress
+                                const canvas = document.createElement('canvas');
+                                let width = img.width;
+                                let height = img.height;
+
+                                // Max dimensions - very small for token efficiency
+                                const maxDim = 400;
+                                if (width > maxDim || height > maxDim) {
+                                    if (width > height) {
+                                        height = (height / width) * maxDim;
+                                        width = maxDim;
+                                    } else {
+                                        width = (width / height) * maxDim;
+                                        height = maxDim;
+                                    }
+                                }
+
+                                canvas.width = width;
+                                canvas.height = height;
+                                const ctx = canvas.getContext('2d');
+                                ctx.drawImage(img, 0, 0, width, height);
+
+                                // Convert to JPEG with very low quality for smallest size
+                                const compressedData = canvas.toDataURL('image/jpeg', 0.3);
+                                resolve({
+                                    name: file.name,
+                                    type: 'image/jpeg',
+                                    data: compressedData,
+                                    url: cloudinaryUrl // Add the Cloudinary URL
+                                });
+                            };
+                            img.onerror = reject;
+                            img.src = e.target.result;
+                        };
+                        reader.onerror = reject;
+                        reader.readAsDataURL(file);
+                    } else {
+                        // Non-image files
+                        const reader = new FileReader();
+                        reader.onload = () => {
+                            resolve({
+                                name: file.name,
+                                type: file.type,
+                                data: reader.result
+                            });
+                        };
+                        reader.onerror = reject;
+                        reader.readAsDataURL(file);
+                    }
                 });
             });
             return Promise.all(promises);
         }
 
-        // Setup file uploads - temporarily disabled
-        // setupFileUpload('landing-file-input', 'landing-file-preview', landingFiles);
-        // setupFileUpload('app-file-input', 'app-file-preview', appFiles);
+        // Setup file uploads
+        setupFileUpload('landing-file-input', 'landing-file-preview', landingFiles);
+        setupFileUpload('app-file-input', 'app-file-preview', appFiles);
+
+        // Voice Input functionality
+        let recognition = null;
+        let isRecording = false;
+
+        function initVoiceInput() {
+            // Check if browser supports speech recognition
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                console.log('Speech recognition not supported in this browser');
+                // Hide voice buttons if not supported
+                document.querySelectorAll('.voice-input-btn').forEach(btn => btn.style.display = 'none');
+                return;
+            }
+
+            recognition = new SpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = 'de-DE'; // German language
+
+            // Landing page voice button
+            const landingVoiceBtn = document.getElementById('landing-voice-btn');
+            const landingPrompt = document.getElementById('landing-prompt');
+
+            if (landingVoiceBtn) {
+                landingVoiceBtn.addEventListener('click', () => {
+                    toggleVoiceInput(landingVoiceBtn, landingPrompt);
+                });
+            }
+
+            // App section voice button
+            const appVoiceBtn = document.getElementById('app-voice-btn');
+            const appPrompt = document.getElementById('prompt');
+
+            if (appVoiceBtn) {
+                appVoiceBtn.addEventListener('click', () => {
+                    toggleVoiceInput(appVoiceBtn, appPrompt);
+                });
+            }
+        }
+
+        function toggleVoiceInput(button, textarea) {
+            if (!recognition) return;
+
+            if (isRecording) {
+                recognition.stop();
+                button.classList.remove('recording');
+                button.textContent = '🎤';
+                isRecording = false;
+            } else {
+                recognition.start();
+                button.classList.add('recording');
+                button.textContent = '⏹️';
+                isRecording = true;
+
+                let finalTranscript = textarea.value;
+
+                recognition.onresult = (event) => {
+                    let interimTranscript = '';
+
+                    for (let i = event.resultIndex; i < event.results.length; i++) {
+                        const transcript = event.results[i][0].transcript;
+                        if (event.results[i].isFinal) {
+                            finalTranscript += (finalTranscript ? ' ' : '') + transcript;
+                        } else {
+                            interimTranscript += transcript;
+                        }
+                    }
+
+                    textarea.value = finalTranscript + (interimTranscript ? ' ' + interimTranscript : '');
+                };
+
+                recognition.onerror = (event) => {
+                    console.error('Speech recognition error:', event.error);
+                    button.classList.remove('recording');
+                    button.textContent = '🎤';
+                    isRecording = false;
+                };
+
+                recognition.onend = () => {
+                    button.classList.remove('recording');
+                    button.textContent = '🎤';
+                    isRecording = false;
+                };
+            }
+        }
+
+        // Initialize voice input
+        initVoiceInput();
 
         // Fullscreen toggle
         function toggleFullscreen() {
@@ -2824,6 +3862,84 @@
         //             .catch(error => console.log('SW registration failed:', error));
         //     });
         // }
+
+        // Initialize Drag & Drop for File Upload Sections
+        function setupDragAndDrop(fileUploadSection, fileInput, filesArray, previewId) {
+            if (!fileUploadSection) return;
+
+            // Click on section to open file dialog
+            fileUploadSection.addEventListener('click', (e) => {
+                if (e.target === fileUploadSection || e.target.className.includes('file-upload')) {
+                    fileInput.click();
+                }
+            });
+
+            // Prevent default drag behaviors
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                fileUploadSection.addEventListener(eventName, preventDefaults, false);
+                document.body.addEventListener(eventName, preventDefaults, false);
+            });
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            // Highlight drop area when dragging over
+            ['dragenter', 'dragover'].forEach(eventName => {
+                fileUploadSection.addEventListener(eventName, () => {
+                    fileUploadSection.classList.add('drag-over');
+                }, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                fileUploadSection.addEventListener(eventName, () => {
+                    fileUploadSection.classList.remove('drag-over');
+                }, false);
+            });
+
+            // Handle dropped files
+            fileUploadSection.addEventListener('drop', (e) => {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+
+                if (files.length > 0) {
+                    // Add files to the array
+                    filesArray.length = 0; // Clear existing
+                    Array.from(files).forEach(file => filesArray.push(file));
+
+                    // Update file input
+                    const dataTransfer = new DataTransfer();
+                    Array.from(files).forEach(file => dataTransfer.items.add(file));
+                    fileInput.files = dataTransfer.files;
+
+                    // Update preview
+                    updateFilePreview(previewId, filesArray);
+
+                    console.log(`${files.length} file(s) dropped`);
+                }
+            }, false);
+
+            // Handle file input change
+            fileInput.addEventListener('change', (e) => {
+                filesArray.length = 0; // Clear existing
+                Array.from(e.target.files).forEach(file => filesArray.push(file));
+                updateFilePreview(previewId, filesArray);
+            });
+        }
+
+        // Setup drag & drop for both upload sections
+        const landingFileSection = document.querySelector('#student-input-container .file-upload-section');
+        const landingFileInput = document.getElementById('landing-file-input');
+        if (landingFileSection && landingFileInput) {
+            setupDragAndDrop(landingFileSection, landingFileInput, landingFiles, 'landing-file-preview');
+        }
+
+        const appFileSection = document.querySelector('#app-container .file-upload-section');
+        const appFileInput = document.getElementById('app-file-input');
+        if (appFileSection && appFileInput) {
+            setupDragAndDrop(appFileSection, appFileInput, appFiles, 'app-file-preview');
+        }
 
         // Initialize
         checkAuth();

@@ -5,6 +5,8 @@ import cookieParser from 'cookie-parser';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs/promises';
+import multer from 'multer';
+import { v2 as cloudinary } from 'cloudinary';
 import { createApp } from './agent/createApp.js';
 import { authMiddleware, generateToken, type AuthRequest } from './auth/authMiddleware.js';
 import { userStorage } from './auth/userStorage.js';
@@ -15,8 +17,20 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME || 'demo',
+  api_key: process.env.CLOUDINARY_API_KEY || '',
+  api_secret: process.env.CLOUDINARY_API_SECRET || ''
+});
+
+// Configure multer for memory storage
+const upload = multer({ storage: multer.memoryStorage() });
+
 app.use(cors({ credentials: true, origin: true }));
-app.use(express.json());
+// Increase payload limit for file uploads (images can be large when base64 encoded)
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, '../public')));
 
@@ -237,6 +251,207 @@ app.patch('/api/auth/password', authMiddleware, async (req: AuthRequest, res) =>
   } catch (error) {
     console.error('Password update error:', error);
     res.status(500).json({ error: 'Failed to update password' });
+  }
+});
+
+// AI Suggestions endpoint - generates contextual improvement suggestions
+app.post('/api/ai-suggestions', authMiddleware, async (req, res) => {
+  try {
+    const { prompt, projectFiles } = req.body;
+
+    if (!prompt) {
+      return res.status(400).json({ error: 'Prompt is required' });
+    }
+
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+    if (!apiKey || apiKey === 'your_api_key_here') {
+      // Fallback if no API key
+      return res.json({
+        suggestions: {
+          message: `Ich habe deine Anfrage "${prompt}" analysiert.
+
+## 💡 Allgemeine Verbesserungsvorschläge
+
+**Funktionalität:**
+- Füge interaktive Elemente hinzu
+- Implementiere Benutzer-Feedback
+- Erweitere die Kernfunktionen
+
+**Design & UX:**
+- Optimiere für mobile Geräte
+- Verbessere die Ladezeiten
+- Füge visuelle Indikatoren hinzu
+
+Welche dieser Ideen möchtest du umsetzen?`,
+          chips: [
+            'Interaktive Elemente hinzufügen',
+            'Mobile Optimierung',
+            'Performance verbessern',
+            'Benutzer-Feedback einbauen'
+          ]
+        }
+      });
+    }
+
+    const Anthropic = (await import('@anthropic-ai/sdk')).default;
+    const client = new Anthropic({ apiKey });
+
+    // Create a context-aware prompt for suggestions with actual file contents
+    let contextPrompt = `Der Benutzer hat folgende App erstellt: "${prompt}"`;
+
+    if (projectFiles && projectFiles.length > 0) {
+      contextPrompt += `\n\nDie App besteht aus ${projectFiles.length} Datei(en):\n\n`;
+
+      // Include actual file contents for better context
+      projectFiles.forEach((file: any) => {
+        // Limit content length to avoid token limits
+        const maxContentLength = 3000;
+        const content = file.content.length > maxContentLength
+          ? file.content.substring(0, maxContentLength) + '\n... (gekürzt)'
+          : file.content;
+
+        contextPrompt += `### Datei: ${file.path}\n\`\`\`\n${content}\n\`\`\`\n\n`;
+      });
+    }
+
+    const response = await client.messages.create({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 2000,
+      messages: [{
+        role: 'user',
+        content: `${contextPrompt}
+
+Analysiere diese SPEZIFISCHE App und ihren CODE im Detail. Schaue dir genau an:
+- Welche Features und Funktionen bereits implementiert sind
+- Welchen Zweck die App erfüllt und für welche Zielgruppe sie ist
+- Welches Design und welche UX-Patterns verwendet werden
+- Welche technischen Implementierungen vorhanden sind
+
+Erstelle dann projektspezifische, auf DIESE KONKRETE APP zugeschnittene Verbesserungsvorschläge im folgenden Format:
+
+## [Kategorie 1 mit passendem Emoji]
+
+**Unterkategorie:**
+- Konkreter Vorschlag 1 (basierend auf dem vorhandenen Code)
+- Konkreter Vorschlag 2 (basierend auf dem vorhandenen Code)
+
+## [Kategorie 2 mit passendem Emoji]
+
+**Unterkategorie:**
+- Konkreter Vorschlag 3 (basierend auf dem vorhandenen Code)
+- Konkreter Vorschlag 4 (basierend auf dem vorhandenen Code)
+
+WICHTIG:
+- Analysiere den TATSÄCHLICHEN Code und die Features dieser spezifischen App
+- Gib NUR Vorschläge, die auf die vorhandene Implementierung aufbauen
+- Sei konkret und spezifisch - keine generischen Tipps!
+- Wenn es z.B. eine Studierenden-App ist, erwähne studierende-spezifische Features
+- Wenn bestimmte Features fehlen, die für diese Zielgruppe wichtig sind, schlage sie vor
+- Nutze Markdown-Formatierung (##, **, -)
+- Gib 3-4 gut strukturierte Kategorien
+- Am Ende: Stelle eine Frage zur nächsten Priorität basierend auf dem vorhandenen Code
+- Erstelle auch 4 kurze, umsetzbare Vorschläge als "Action Items" (max 4-5 Wörter pro Item)
+
+ANTWORT-FORMAT:
+{
+  "message": "[Dein formatierter Markdown-Text hier mit projektspezifischen Vorschlägen]",
+  "chips": ["Action Item 1", "Action Item 2", "Action Item 3", "Action Item 4"]
+}`
+      }]
+    });
+
+    // Parse the AI response
+    const textContent = response.content.find(block => block.type === 'text');
+    if (!textContent || textContent.type !== 'text') {
+      throw new Error('No text response from AI');
+    }
+
+    // Try to parse JSON from the response
+    let suggestions;
+    try {
+      // Extract JSON from code blocks if present
+      const jsonMatch = textContent.text.match(/```json\s*([\s\S]*?)\s*```/) ||
+                       textContent.text.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        suggestions = JSON.parse(jsonMatch[1] || jsonMatch[0]);
+      } else {
+        suggestions = JSON.parse(textContent.text);
+      }
+    } catch (parseError) {
+      // If JSON parsing fails, use the raw text
+      suggestions = {
+        message: textContent.text,
+        chips: [
+          'Funktion erweitern',
+          'Design verbessern',
+          'Performance optimieren',
+          'Features hinzufügen'
+        ]
+      };
+    }
+
+    res.json({ suggestions });
+  } catch (error) {
+    console.error('AI suggestions error:', error);
+    res.status(500).json({
+      error: 'Failed to generate suggestions',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+// Image upload endpoint - uploads images to Cloudinary and returns URLs
+app.post('/api/upload-image', authMiddleware, upload.single('image'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No image file provided' });
+    }
+
+    // Check if Cloudinary is configured
+    const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+    const apiKey = process.env.CLOUDINARY_API_KEY;
+    const apiSecret = process.env.CLOUDINARY_API_SECRET;
+
+    if (!cloudName || !apiKey || !apiSecret || cloudName === 'demo') {
+      // Fallback: return base64 data URL if Cloudinary not configured
+      const base64 = req.file.buffer.toString('base64');
+      const dataUrl = `data:${req.file.mimetype};base64,${base64}`;
+      return res.json({
+        success: true,
+        url: dataUrl,
+        fallback: true,
+        message: 'Cloudinary not configured, using base64 fallback'
+      });
+    }
+
+    // Upload to Cloudinary
+    const uploadPromise = new Promise<any>((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          folder: 'makeable-uploads',
+          resource_type: 'auto'
+        },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        }
+      );
+      uploadStream.end(req.file!.buffer);
+    });
+
+    const result = await uploadPromise;
+
+    res.json({
+      success: true,
+      url: result.secure_url,
+      publicId: result.public_id
+    });
+  } catch (error) {
+    console.error('Image upload error:', error);
+    res.status(500).json({
+      error: 'Failed to upload image',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    });
   }
 });
 
@@ -472,6 +687,7 @@ app.post('/api/generate', authMiddleware, async (req, res) => {
 
     // Now generate the app in the background
     console.log('Generating app from prompt:', prompt);
+    console.log('Files received:', files ? files.length : 0, 'files');
 
     try {
       // Check if API key is valid
@@ -494,55 +710,94 @@ app.post('/api/generate', authMiddleware, async (req, res) => {
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f9fafb;
+            color: #111827;
+            line-height: 1.6;
+            padding: 2rem;
             min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
         }
         .container {
+            max-width: 800px;
+            margin: 0 auto;
             background: white;
-            border-radius: 20px;
-            padding: 3rem;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            max-width: 600px;
-            width: 100%;
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
-        h1 { color: #667eea; margin-bottom: 1rem; font-size: 2rem; }
-        p { color: #666; line-height: 1.6; margin-bottom: 2rem; }
-        .prompt {
-            background: #f5f5f5;
+        h1 {
+            color: #111827;
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 0.75rem;
+        }
+        p {
+            color: #6b7280;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+        .info-box {
+            background: #f3f4f6;
+            border-left: 3px solid #2563eb;
             padding: 1rem;
-            border-radius: 10px;
-            border-left: 4px solid #667eea;
-            font-style: italic;
+            border-radius: 4px;
+            margin: 1.5rem 0;
+        }
+        .info-box strong {
+            color: #111827;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        .note {
+            background: #fef3c7;
+            border-left: 3px solid #f59e0b;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1.5rem 0;
+            color: #92400e;
         }
         button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #2563eb;
             color: white;
             border: none;
-            padding: 1rem 2rem;
-            border-radius: 10px;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
             font-size: 1rem;
-            font-weight: 600;
+            font-weight: 500;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: background 0.2s;
             margin-top: 1rem;
-            width: 100%;
         }
-        button:hover { transform: translateY(-2px); }
+        button:hover {
+            background: #1d4ed8;
+        }
+        .footer {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e5e7eb;
+            color: #9ca3af;
+            font-size: 0.875rem;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🎨 Demo App</h1>
-        <p>This is a demo app created from your prompt:</p>
-        <div class="prompt">"${prompt}"</div>
-        <p style="margin-top: 2rem;">
-            <strong>Note:</strong> This is mock data. To generate real apps, add a valid Anthropic API key.
-        </p>
-        <button onclick="alert('Button clicked!')">Click Me!</button>
+        <h1>Professional App Template</h1>
+        <p>This application preview was generated based on your requirements:</p>
+        <div class="info-box">
+            <strong>Your Request:</strong>
+            <p style="margin: 0; color: #374151;">"${prompt}"</p>
+        </div>
+        <div class="note">
+            <strong>⚠️ Configuration Required</strong>
+            <p style="margin: 0;">This is a preview template. To generate fully functional, production-ready applications with AI, please configure your Anthropic API key in the environment settings.</p>
+        </div>
+        <button onclick="alert('Feature activated! In production, this would trigger your app\\'s main functionality.')">Get Started</button>
+        <div class="footer">
+            Generated by Makeable • Professional App Builder
+        </div>
     </div>
 </body>
 </html>`
